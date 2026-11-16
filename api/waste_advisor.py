@@ -1639,20 +1639,19 @@ class WasteAdvisor:
         ])
 
         conflicting_waste_key = self._find_waste_key(message_clean)
-        # If user explicitly asks about another material (e.g. "what about glass?"), don't force detection context
-        is_asking_other_material = bool(conflicting_waste_key and has_detection and conflicting_waste_key != self.last_detection.get("waste_type"))
+        # Explicit photo-specific keywords that genuinely require a photo
+        photo_specific_keywords = [
+            "uploaded", "i uploaded", "the item i uploaded", "item i uploaded",
+            "my photo", "my image", "my picture", "this image", "this photo",
+            "what did i upload", "in the picture", "in the photo", "in the image",
+            "captured in picture", "picture i uploaded", "picture i used"
+        ]
+        is_asking_about_photo = any(kw in message_lower for kw in photo_specific_keywords)
 
-        is_context_relevant = False
-        if any(kw in message_lower for kw in explicit_detection_keywords):
-            is_context_relevant = True
-        elif has_detection and not is_asking_other_material:
+        if has_detection and not (conflicting_waste_key and conflicting_waste_key != self.last_detection.get("waste_type")):
             words = set(re.findall(r'\b\w+\b', message_lower))
             has_pronoun = bool(words.intersection({"it", "this", "that", "item", "object"}))
-            if has_pronoun or is_reuse_query or is_recycle_query or is_guess_query or is_decompose_query or is_disposal_query or is_objects_list_query:
-                is_context_relevant = True
-
-        if is_context_relevant:
-            if has_detection:
+            if has_pronoun or is_asking_about_photo or is_reuse_query or is_recycle_query or is_guess_query or is_decompose_query or is_disposal_query or is_objects_list_query:
                 waste_type = self.last_detection.get("waste_type")
                 confidence = self.last_detection.get("confidence", 0.0)
                 bbox = self.last_detection.get("bbox")
@@ -1675,18 +1674,18 @@ class WasteAdvisor:
                     return self.get_detection_advice(waste_type, confidence, bbox, detected_object=detected_object)
                 else:
                     return self.get_detection_advice(waste_type, confidence, bbox, detected_object=detected_object)
-            else:
-                return {
-                    "message": (
-                        "📷 **No waste item has been uploaded or detected yet!**\n\n"
-                        "To analyze and guess the object:\n"
-                        "1. Go to the **Scanner** on the left\n"
-                        "2. 📤 **Upload an image** or 📹 **Start the webcam** to scan your item\n\n"
-                        "Once detected, I will guess the specific object, show you how to recycle it, and share creative household reuse ideas!"
-                    ),
-                    "type": "no_detection_context",
-                    "waste_info": None,
-                }
+        elif not has_detection and is_asking_about_photo:
+            return {
+                "message": (
+                    "📷 **No waste item has been uploaded or detected yet!**\n\n"
+                    "To analyze and guess the object:\n"
+                    "1. Go to the **Scanner** on the left\n"
+                    "2. 📤 **Upload an image** or 📹 **Start the webcam** to scan your item\n\n"
+                    "Once detected, I will guess the specific object, show you how to recycle it, and share creative household reuse ideas!"
+                ),
+                "type": "no_detection_context",
+                "waste_info": None,
+            }
 
         # ── Pass 2: Plastic type queries ──────────────────────────────────────
         plastic_type_match = self._check_plastic_type(message_clean)
