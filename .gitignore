@@ -25,6 +25,11 @@ version one/
 # Datasets and archives
 waste.v28i.yolov11.zip
 test C2S/*.zip
+training_data/
+waste-detection.v1i.yolov8/
+P-yesist-v2/
+test C2S/
+
 
 # Logs and runtime artifacts
 logs/*.log

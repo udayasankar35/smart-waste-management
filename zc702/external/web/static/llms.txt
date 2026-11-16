@@ -1,0 +1,22 @@
+# EcoSort AI — Multimodal Waste Segregation & Circular Recycling Assistant
+
+> EcoSort AI is an on-device edge AI system developed for smart waste segregation, material classification, resin code identification, and circular economy reuse recommendations.
+
+## System Overview
+- **Perception Engine**: Custom fine-tuned Ultralytics YOLOv8 / YOLO11s model trained on 4,686 annotated waste images across plastics, aluminum, cardboard, glass, organic, and hazardous materials.
+- **Local Reasoning & Advisor**: Embedded Llama 3.2 1B Instruct (Quantized GGUF Q4_K_M) running locally on edge hardware (Arm SoC / CPU / GPU) for real-time natural language guidance without cloud latency.
+- **Material Science Knowledge Base**: Evaluates Resin Identification Codes (RIC #1 through #7), decomposition timelines, and actionable three-step disposal guidance (Empty -> Rinse -> Recycle/Upcycle).
+- **Environmental Telemetry**: Tracks segregation events, contamination alerts, and carbon offsets in local SQLite storage.
+
+## Key Web Sections
+- `/` : Main interactive web dashboard featuring live webcam frame evaluation, drag-and-drop photo detection, AI waste advisor chatbot, and historical monitoring records.
+- `#scanner-section` : Real-time perception workspace with bounding box overlay and resin classification.
+- `#categories-section` : Comprehensive material guides for Plastics, Paper, Metals, Glass, Organics, and Hazardous waste.
+- `#pipeline-section` : High-performance edge AI architecture overview.
+
+## API Endpoints
+- `POST /api/detect` : Analyzes image upload for waste classification, bounding boxes, and material advice.
+- `GET /api/webcam/feed` : Live multipart JPEG stream from connected camera with YOLO detection overlay.
+- `POST /api/chat` : Conversational query interface with local Llama 1B Recycling Advisor.
+- `GET /api/dashboard/stats` : Aggregated segregation metrics, item distribution, and sensor alerts.
+- `GET /api/records` : Historical detection records log with filtering capabilities.

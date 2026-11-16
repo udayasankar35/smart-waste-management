@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="ecoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#10b981" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#030b07"/>
+  <rect width="60" height="60" x="2" y="2" rx="12" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="1.5"/>
+  <g filter="url(#glow)">
+    <!-- Continuous loop arrow recycling symbol -->
+    <path d="M22 46 H16 A4 4 0 0 1 12.5 40 L19 28 L23 30.5 L18 41 H22 Z" fill="url(#ecoGrad)"/>
+    <path d="M28 17 L32 10 L44 32 L40 34 L32 19 L26 29 Z" fill="url(#ecoGrad)"/>
+    <path d="M48 46 H34 L37 41 H46 A4 4 0 0 0 49.5 40 L53 34 L56.5 36 L52 44 A6 6 0 0 1 48 46 Z" fill="url(#ecoGrad)"/>
+    <!-- Center AI Node spark -->
+    <circle cx="32" cy="32" r="3.5" fill="#34d399"/>
+  </g>
+</svg>

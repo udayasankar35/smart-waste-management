@@ -1,0 +1,11 @@
+id,timestamp,waste_type,ai_confidence,ai_class,humidity,temperature,gas_level,moisture_level,bin_fill_level,is_wet,is_hazardous,gas_alert,bin_alert,vehicle_id,created_at
+10,2026-03-14T13:19:30,no_detection,0.0,,68.9,25.9,334,12265,85.2,1,0,safe,full,GV-12,2026-03-14 07:49:30
+9,2026-03-14T13:19:28,no_detection,0.0,,47.3,30.5,266,37389,33.5,0,0,safe,normal,GV-12,2026-03-14 07:49:28
+8,2026-03-14T13:19:28,no_detection,0.0,,81.3,26.2,627,39090,27.5,1,0,safe,normal,GV-12,2026-03-14 07:49:28
+7,2026-03-14T13:19:27,no_detection,0.0,,36.5,28.2,714,50038,25.7,1,1,warning,normal,GV-12,2026-03-14 07:49:27
+6,2026-03-14T13:19:26,no_detection,0.0,,82.2,23.7,216,37472,19.0,1,0,safe,normal,GV-12,2026-03-14 07:49:26
+5,2026-03-14T13:19:25,no_detection,0.0,,70.9,34.1,413,26406,47.5,1,0,safe,normal,GV-12,2026-03-14 07:49:25
+4,2026-03-14T13:19:25,no_detection,0.0,,44.0,25.4,554,47168,78.0,1,0,safe,nearly_full,GV-12,2026-03-14 07:49:25
+3,2026-03-14T13:19:22,no_detection,0.0,,63.0,23.0,101,12174,55.4,0,0,safe,normal,GV-12,2026-03-14 07:49:22
+2,2026-03-14T13:19:20,no_detection,0.0,,41.8,22.9,296,34757,53.8,0,0,safe,normal,GV-12,2026-03-14 07:49:20
+1,2026-03-14T13:19:18,no_detection,0.0,,78.0,25.4,868,11861,69.3,1,1,warning,nearly_full,GV-12,2026-03-14 07:49:18
