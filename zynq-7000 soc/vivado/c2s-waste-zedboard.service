@@ -1,0 +1,19 @@
+[Unit]
+Description=C2S Smart Waste AI System (ZedBoard Zynq-7000)
+After=network.target local-fs.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/c2s
+Environment="C2S_EXT_STORAGE=/mnt/ext_storage"
+ExecStartPre=/bin/sh -c 'swapon /mnt/ext_storage/swapfile || true'
+ExecStart=/usr/bin/python3 /opt/c2s/main_zynq.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+

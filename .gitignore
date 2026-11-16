@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.dll
+*.so
+*.dylib
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+version one/
+"version one"/
+
+# Large model weights (>50MB, cannot be committed directly to GitHub)
+*.gguf
+*.pte
+*.onnx
+*.zip
+*.tar.gz
+
+# Datasets and archives
+waste.v28i.yolov11.zip
+test C2S/*.zip
+
+# Logs and runtime artifacts
+logs/*.log
+*.log
+_patch_tmp/
+.pytest_cache/
+.claude/
+
+# Database journals and active locks
+*.db-journal
+
+# Vivado and EDA build files
+*.jou
+*.str
+*.gen/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.xpr
+vivado_project/
+vivado_zedboard_project/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+.tmp.driveupload/
+*.tmp
+

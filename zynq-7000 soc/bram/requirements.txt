@@ -1,0 +1,35 @@
+# AI-Enabled Smart Waste Segregation & Monitoring System
+# Install: pip install -r requirements.txt
+
+# ─── AI / Computer Vision ───────────────
+ultralytics>=8.0.0          # YOLOv8
+opencv-python>=4.8.0        # Camera & image processing
+numpy>=1.24.0               # Array operations
+torch>=2.0.0                # PyTorch (Jetson: use NVIDIA's wheel)
+torchvision>=0.15.0         # Vision transforms
+
+# ─── Sensor Communication ──────────────
+pyserial>=3.5               # Serial (UART) from Pico W
+
+# ─── Database ──────────────────────────
+# sqlite3 is built-in to Python
+
+# ─── Report Generation ─────────────────
+reportlab>=4.0              # PDF reports
+matplotlib>=3.7.0           # Charts in PDF
+Pillow>=10.0.0              # Image handling
+
+# ─── Dashboard ─────────────────────────
+streamlit>=1.30.0           # Analytics dashboard
+plotly>=5.18.0              # Interactive charts
+pandas>=2.1.0               # Data manipulation
+
+# ─── Alerts ────────────────────────────
+# smtplib is built-in for email
+requests>=2.31.0            # HTTP API calls (optional)
+
+# ─── Web Interface ─────────────────────
+flask>=3.0.0                # Web application server
+
+# ─── Llama 3.2 Local LLM ──────────────
+llama-cpp-python>=0.2.80    # On-device Llama inference (GGUF)
