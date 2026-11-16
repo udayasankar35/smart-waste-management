@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSort AI — On-Device Multimodal Waste Segregation & Circular Recycling Platform</title>
+    <meta name="description"
+        content="Production-grade on-device AI waste segregation assistant powered by YOLOv8 and Llama 1B. Real-time object classification, Resin Identification Codes (RIC #1-#7), circular upcycling guides, and environmental telemetry.">
+    <meta name="keywords"
+        content="waste segregation, recycling AI, circular economy, YOLOv8 edge, Llama 1B local, resin codes, plastic recycling, smart city tech">
+    <meta name="author" content="EcoSort AI · Bharat AI-SoC">
+    <meta name="theme-color" content="#030b07">
+    <link rel="canonical" href="https://ecosort.ai/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="alternate icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ecosort.ai/">
+    <meta property="og:title" content="EcoSort AI — On-Device Multimodal Waste Segregation Platform">
+    <meta property="og:description"
+        content="Instant edge AI waste detection, polymer resin estimation (RIC #1-#7), upcycling guides, and environmental telemetry running locally on YOLOv8 & Llama 1B.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/hero-ai-recycling.jpg') }}">
+    <meta property="og:site_name" content="EcoSort AI">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ecosort.ai/">
+    <meta name="twitter:title" content="EcoSort AI — Intelligent Waste Segregation & Circular Economy">
+    <meta name="twitter:description"
+        content="Multimodal waste detection with local YOLOv8 perception and Llama 1B generative reasoning.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/hero-ai-recycling.jpg') }}">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://ecosort.ai/#app",
+          "name": "EcoSort AI",
+          "url": "https://ecosort.ai/",
+          "description": "On-device multimodal AI waste classification, resin code identification, and circular economy reuse assistant.",
+          "applicationCategory": "EnvironmentalApplication",
+          "operatingSystem": "All (Web, Arm SoC, Embedded Linux, Windows, macOS)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Live Camera Real-time YOLO Detection",
+            "Resin Identification Code (RIC #1-7) Estimation",
+            "On-Device Llama 1B Waste Advisory Chatbot",
+            "Circular Economy Household Upcycling Guides",
+            "Telemetry & Environmental Diversion Dashboard"
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://ecosort.ai/#breadcrumbs",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://ecosort.ai/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Perception Engine",
+              "item": "https://ecosort.ai/#scanner-section"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Material Science",
+              "item": "https://ecosort.ai/#categories-section"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "AI Advisor",
+              "item": "https://ecosort.ai/#panel-chatbot"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- Typography & Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=8.0.0">
+    <style id="ecosort-editorial-theme">
+        :root {
+            /* Editorial Design Tokens */
+            --bg-primary: #07130E !important;
+            --bg-secondary: #0A1C14 !important;
+            --bg-surface: #0E241B !important;
+            --bg-card: #0C1F17 !important;
+            --bg-card-alt: #132E22 !important;
+            --bg-hover: #17382B !important;
+
+            --accent: #84CC16 !important;
+            --accent-light: #A3E635 !important;
+            --accent-mint: #4ADE80 !important;
+            --accent-dim: rgba(132, 204, 22, 0.12) !important;
+            --accent-glow: rgba(132, 204, 22, 0.22) !important;
+            --accent-border: rgba(132, 204, 22, 0.35) !important;
+
+            --text-primary: #F4F1EA !important;
+            --text-secondary: #C5BFB3 !important;
+            --text-muted: #7E8A81 !important;
+
+            --border: rgba(255, 255, 255, 0.08) !important;
+            --border-hover: rgba(132, 204, 22, 0.40) !important;
+
+            --font-heading: 'Fraunces', Georgia, serif !important;
+            --font-serif: 'Fraunces', Georgia, serif !important;
+            --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+            --font-mono: 'JetBrains Mono', monospace !important;
+
+            --radius-sm: 6px !important;
+            --radius-md: 12px !important;
+            --radius-lg: 18px !important;
+            --radius-xl: 24px !important;
+            --radius-full: 9999px !important;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #F7F5EE !important;
+            --bg-secondary: #EDE8DF !important;
+            --bg-surface: #FFFFFF !important;
+            --bg-card: #FFFFFF !important;
+            --bg-card-alt: #F3EFE7 !important;
+            --bg-hover: #E8E2D5 !important;
+
+            --accent: #4D7C0F !important;
+            --accent-light: #65A30D !important;
+            --accent-mint: #15803D !important;
+            --accent-dim: rgba(77, 124, 15, 0.10) !important;
+            --accent-border: rgba(77, 124, 15, 0.35) !important;
+
+            --text-primary: #07130E !important;
+            --text-secondary: #2B3A31 !important;
+            --text-muted: #64756A !important;
+
+            --border: rgba(7, 19, 14, 0.12) !important;
+            --border-hover: rgba(77, 124, 15, 0.40) !important;
+        }
+
+        body {
+            background-color: var(--bg-primary) !important;
+            background-image: none !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-body) !important;
+            -webkit-font-smoothing: antialiased !important;
+        }
+
+        /* Eliminate floating blobs */
+        .ambient-orb {
+            display: none !important;
+        }
+
+        /* Editorial Typography */
+        h1, h2, h3, h4, .hero-title, .section-title, .brand-title {
+            font-family: var(--font-heading) !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        .hero-editorial-italic, .editorial-italic {
+            font-family: var(--font-serif) !important;
+            font-style: italic !important;
+            font-weight: 400 !important;
+            color: var(--accent-light) !important;
+        }
+
+        /* Section Eyebrow Tags */
+        .section-tag, .node-step-tag, .inference-badge, .stat-label {
+            font-family: var(--font-mono) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+        }
+
+        /* High-Contrast Restrained Buttons */
+        .btn-hero-primary, .btn-accent {
+            background: var(--accent) !important;
+            color: #07130E !important;
+            font-family: var(--font-body) !important;
+            font-weight: 700 !important;
+            border: none !important;
+            box-shadow: 0 4px 18px rgba(132, 204, 22, 0.35) !important;
+            animation: none !important;
+            border-radius: var(--radius-md) !important;
+        }
+
+        .btn-hero-primary:hover, .btn-accent:hover {
+            background: var(--accent-light) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 24px rgba(132, 204, 22, 0.45) !important;
+        }
+
+        .btn-hero-secondary, .btn-secondary {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-body) !important;
+            font-weight: 600 !important;
+            animation: none !important;
+            border-radius: var(--radius-md) !important;
+        }
+
+        .btn-hero-secondary:hover, .btn-secondary:hover {
+            border-color: var(--accent) !important;
+            color: var(--accent-light) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* Category Card Extended Details Permanently Visible */
+        .category-expand-drawer {
+            max-height: none !important;
+            opacity: 1 !important;
+            overflow: visible !important;
+            transform: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+            margin-top: 0.5rem !important;
+        }
+
+        /* Drop Zone Tactile Aesthetics */
+        .drop-zone {
+            border: 1.5px dashed var(--accent-border) !important;
+            background: rgba(14, 36, 27, 0.45) !important;
+            border-radius: var(--radius-md) !important;
+            transition: all 0.25s ease !important;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--accent) !important;
+            background: var(--accent-dim) !important;
+        }
+
+        /* Sticky Minimalist Navbar */
+        .header-nav {
+            background: rgba(7, 19, 14, 0.92) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        [data-theme="light"] .header-nav {
+            background: rgba(247, 245, 238, 0.94) !important;
+            border-bottom: 1px solid rgba(7, 19, 14, 0.12) !important;
+        }
+
+        /* Respect Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .reveal-on-scroll, .reveal-child {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            try {
+                var savedTheme = localStorage.getItem('ecosort_theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Ambient orbs removed for clean editorial presentation -->
+
+    <!-- ─── Sticky Glass Navbar ───────────────────────────────────────────── -->
+    <header class="header-nav" id="mainHeader">
+        <div class="nav-container">
+            <a href="#hero" class="nav-brand" onclick="scrollToSection('hero')">
+                <div class="brand-logo-badge">
+                    <svg class="brand-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" />
+                        <path d="M11 19h8.2a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0 0-1.8L17 9" />
+                        <path d="m11 2 4.5 8h-9z" />
+                    </svg>
+                </div>
+                <div class="brand-titles">
+                    <span class="brand-title">EcoSort</span>
+                    <span class="brand-badge-sub">Smart Recycling Assistant</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="nav-links" id="desktopNav">
+                <button class="nav-link-btn" onclick="scrollToSection('scanner-section'); setMode('webcam')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                        </path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    <span>Scan</span>
+                </button>
+                <button class="nav-link-btn" onclick="scrollToSection('scanner-section'); setMode('gallery')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Upload</span>
+                </button>
+                <button class="nav-link-btn" onclick="switchTab('chatbot'); scrollToSection('panel-chatbot')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                        <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                        <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                    </svg>
+                    <span>Ask EcoSort</span>
+                </button>
+                <button class="nav-link-btn" onclick="scrollToSection('pipeline-section')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    <span>How it Works</span>
+                </button>
+                <button class="nav-link-btn" onclick="scrollToSection('categories-section')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span>Categories</span>
+                </button>
+                <button class="nav-link-btn" onclick="switchTab('dashboard'); scrollToSection('panel-dashboard')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-link-btn" onclick="switchTab('records'); scrollToSection('panel-records')">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                    <span>Records</span>
+                </button>
+            </nav>
+
+            <!-- Status Indicator, Theme Toggle & Mobile Toggle -->
+            <div class="nav-right">
+                <!-- Regional Recycling Rules Selector -->
+                <div class="region-selector-wrap" title="Select Local Municipal Recycling Rules">
+                    <select id="regionSelect" class="region-selector-dropdown" onchange="selectRegionalRules(this.value)" aria-label="Regional Recycling Standards">
+                        <option value="munich">🇩🇪 Munich (Pfand)</option>
+                        <option value="california">🇺🇸 California (SB 54)</option>
+                        <option value="tokyo">🇯🇵 Tokyo (3-Stream)</option>
+                        <option value="india">🇮🇳 India (SWM 2016)</option>
+                        <option value="global">🌐 Global ISO</option>
+                    </select>
+                </div>
+
+                <div class="status-indicator-pill" id="systemStatusPill" title="Arm Native Backend Status">
+                    <span class="status-dot online" id="statusDot"></span>
+                    <span class="status-text" id="statusText">Arm Native</span>
+                </div>
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()"
+                    aria-label="Toggle light or dark theme" title="Switch Theme">
+                    <span class="theme-icon-wrap">
+                        <svg class="ui-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="ui-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </span>
+                    <span class="theme-label-text" id="themeLabelText">Dark</span>
+                </button>
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu"
+                    onclick="toggleMobileMenu()">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div class="mobile-drawer" id="mobileDrawer">
+            <div class="mobile-drawer-content">
+                <div class="mobile-theme-row" style="margin-bottom: 12px;">
+                    <span class="mobile-theme-text">Regional Standards</span>
+                    <select id="mobileRegionSelect" class="region-selector-dropdown mobile-region-dropdown" onchange="selectRegionalRules(this.value)" aria-label="Mobile Regional Recycling Standards">
+                        <option value="munich">🇩🇪 Munich (Pfand)</option>
+                        <option value="california">🇺🇸 California (SB 54)</option>
+                        <option value="tokyo">🇯🇵 Tokyo (3-Stream)</option>
+                        <option value="india">🇮🇳 India (SWM 2016)</option>
+                        <option value="global">🌐 Global ISO</option>
+                    </select>
+                </div>
+                <div class="mobile-theme-row">
+                    <span class="mobile-theme-text">Color Theme</span>
+                    <button class="theme-toggle-btn mobile-theme-btn" onclick="toggleTheme()"
+                        aria-label="Toggle light or dark theme">
+                        <span class="theme-icon-wrap">
+                            <svg class="ui-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="ui-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </span>
+                        <span id="mobileThemeLabelText">Dark Mode</span>
+                    </button>
+                </div>
+                <button class="mobile-nav-link"
+                    onclick="scrollToSection('scanner-section'); setMode('webcam'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                        </path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    <span>Live Camera Scan</span>
+                </button>
+                <button class="mobile-nav-link"
+                    onclick="scrollToSection('scanner-section'); setMode('gallery'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Upload Waste Image</span>
+                </button>
+                <button class="mobile-nav-link"
+                    onclick="switchTab('chatbot'); scrollToSection('panel-chatbot'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                        <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                        <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                    </svg>
+                    <span>Ask AI Assistant</span>
+                </button>
+                <button class="mobile-nav-link" onclick="scrollToSection('pipeline-section'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    <span>How EcoSort Works</span>
+                </button>
+                <button class="mobile-nav-link" onclick="scrollToSection('categories-section'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span>Waste Categories</span>
+                </button>
+                <button class="mobile-nav-link"
+                    onclick="switchTab('dashboard'); scrollToSection('panel-dashboard'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Live Dashboard</span>
+                </button>
+                <button class="mobile-nav-link"
+                    onclick="switchTab('records'); scrollToSection('panel-records'); toggleMobileMenu()">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                    <span>Segregation Records</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION B – HERO SECTION WITH SCANNER DEMO
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="hero-section" id="hero">
+            <!-- Hero Background Layer with subtle environmental depth -->
+            <div class="hero-bg-layer" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/hero-ai-recycling.jpg') }}"
+                    alt="EcoSort AI sustainable smart recycling facility and waste management" class="hero-bg-image"
+                    width="1792" height="1024" loading="eager">
+                <div class="hero-bg-overlay"></div>
+            </div>
+
+            <div class="hero-container">
+                <!-- Hero Left: Editorial Narrative & Telemetry -->
+                <div class="hero-content reveal-on-scroll">
+                    <div class="hero-pill-badge" title="AI processing executes 100% locally on your computer with zero external server dependency">
+                        <span class="status-pulse-dot"></span>
+                        <span>SYSTEM SPEC 2026 // ON-DEVICE CIRCULAR INTELLIGENCE</span>
+                    </div>
+
+                    <h1 class="hero-title">
+                        Material Intelligence<br>
+                        <span class="hero-editorial-italic">*at the edge.*</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        EcoSort AI pairs high-speed neural vision with on-device generative reasoning to decode waste materials, identify polymer resin standards (RIC #1–#7), and deliver actionable contamination-free circular disposal instructions—100% locally with zero cloud latency.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <button class="btn btn-hero-primary"
+                            onclick="scrollToSection('scanner-section'); setMode('gallery');">
+                            <span>Try the Scanner</span>
+                            <span class="btn-arrow">↓</span>
+                        </button>
+                        <button class="btn btn-hero-secondary"
+                            onclick="scrollToSection('pipeline-section');">
+                            <span>See How It Works</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+
+                    <!-- Editorial Hardware Telemetry Strip -->
+                    <div class="hero-telemetry-ribbon">
+                        <div class="telemetry-item">
+                            <span class="telemetry-idx">01</span>
+                            <div class="telemetry-meta">
+                                <span class="telemetry-label">YOLO11s Vision</span>
+                                <span class="telemetry-val">&lt;15ms Latency</span>
+                            </div>
+                        </div>
+                        <div class="telemetry-sep">/</div>
+                        <div class="telemetry-item">
+                            <span class="telemetry-idx">02</span>
+                            <div class="telemetry-meta">
+                                <span class="telemetry-label">Llama 3.2 1B</span>
+                                <span class="telemetry-val">On-Device LLM</span>
+                            </div>
+                        </div>
+                        <div class="telemetry-sep">/</div>
+                        <div class="telemetry-item">
+                            <span class="telemetry-idx">03</span>
+                            <div class="telemetry-meta">
+                                <span class="telemetry-label">Resin Standards</span>
+                                <span class="telemetry-val">RIC #1–#7 Verified</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Right: Architectural Photo Composition & Tactile Test Chips -->
+                <div class="hero-visual-composition reveal-on-scroll">
+                    <div class="hero-frame-card">
+                        <div class="frame-corner-mark mark-tl">+</div>
+                        <div class="frame-corner-mark mark-tr">+</div>
+                        <div class="frame-corner-mark mark-bl">+</div>
+                        <div class="frame-corner-mark mark-br">+</div>
+
+                        <div class="frame-header-strip">
+                            <span class="frame-tag">SPECIMEN VIEW // BHARAT AI-SoC</span>
+                            <span class="frame-coord">12.9716° N · 77.5946° E</span>
+                        </div>
+
+                        <div class="frame-viewport">
+                            <img src="{{ url_for('static', filename='images/plastic-bottles-dark.webp') }}"
+                                alt="Dark background sorted materials under AI inspection" class="frame-image"
+                                width="1200" height="900" loading="eager">
+
+                            <!-- Subtle focal scanning crosshair HUD -->
+                            <div class="scanner-focal-hud" aria-hidden="true">
+                                <div class="focal-laser-bar"></div>
+                                <div class="focal-badge">
+                                    <span class="focal-dot"></span>
+                                    <span>EDGE CV // YOLO11s SCANNING</span>
+                                </div>
+                            </div>
+
+                            <!-- Live Detection Bounding Box Mockup (PET #1, rinse first) -->
+                            <div class="hero-live-bbox" aria-label="Detected object: PET #1, rinse first">
+                                <div class="bbox-corner bbox-tl"></div>
+                                <div class="bbox-corner bbox-tr"></div>
+                                <div class="bbox-corner bbox-bl"></div>
+                                <div class="bbox-corner bbox-br"></div>
+                                <div class="bbox-chip">
+                                    <span class="bbox-pulse-dot"></span>
+                                    <span class="bbox-resin-pill ric-1">RIC #1 PET</span>
+                                    <span class="bbox-sep">/</span>
+                                    <span class="bbox-advice">Rinse First</span>
+                                    <span class="bbox-conf">98.4%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tactile Sample Material Trays below image -->
+                        <div class="hero-sample-tray">
+                            <span class="tray-label">TEST MATERIAL PRESETS:</span>
+                            <div class="tray-chips-row">
+                                <button class="tray-chip"
+                                    onclick="loadSampleImage('{{ url_for('static', filename='images/hero-bottles.webp') }}', 'PET Bottle #1')"
+                                    title="Click to load and test PET Bottle">
+                                    <span class="chip-color-dot dot-cyan"></span>
+                                    <span>Plastic #1</span>
+                                </button>
+                                <button class="tray-chip"
+                                    onclick="loadSampleImage('{{ url_for('static', filename='images/glass-bottles.webp') }}', 'Flint Glass')"
+                                    title="Click to load and test Glass Bottle">
+                                    <span class="chip-color-dot dot-emerald"></span>
+                                    <span>Glass</span>
+                                </button>
+                                <button class="tray-chip"
+                                    onclick="loadSampleImage('{{ url_for('static', filename='images/metal-cans.webp') }}', 'Aluminum Can')"
+                                    title="Click to load and test Metal Can">
+                                    <span class="chip-color-dot dot-violet"></span>
+                                    <span>Aluminum</span>
+                                </button>
+                                <button class="tray-chip"
+                                    onclick="loadSampleImage('{{ url_for('static', filename='images/cardboard-paper.webp') }}', 'Cardboard Box')"
+                                    title="Click to load and test Cardboard">
+                                    <span class="chip-color-dot dot-amber"></span>
+                                    <span>Fiber #20</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION C – THREE MULTIMODAL INPUT CARDS
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="section-container" id="multimodal-inputs">
+            <div class="section-header reveal-on-scroll">
+                <span class="section-tag">Multimodal Interfaces</span>
+                <h2 class="section-title">Three Ways to Analyze Your Waste</h2>
+                <p class="section-subtitle">Interact with on-device computer vision, drag-and-drop batch analysis, or
+                    natural conversational voice.</p>
+            </div>
+
+            <div class="multimodal-grid">
+                <!-- Card 1: Camera -->
+                <div class="input-feature-card tilt-card reveal-on-scroll"
+                    onclick="scrollToSection('scanner-section'); setMode('webcam'); startWebcam()">
+                    <div class="feature-card-glow"></div>
+                    <div class="feature-icon-badge">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                            </path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Live Camera Stream</h3>
+                    <p class="feature-desc">Point your device camera at any bottle, can, or packaging for real-time visual recognition with instant bounding-box tracking.</p>
+                    <div class="feature-action-link">
+                        <span>Launch Camera</span>
+                        <span class="link-arrow">→</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Image Upload -->
+                <div class="input-feature-card tilt-card reveal-on-scroll"
+                    onclick="scrollToSection('scanner-section'); setMode('gallery'); document.getElementById('fileInput').click()">
+                    <div class="feature-card-glow"></div>
+                    <div class="feature-icon-badge">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Photo Upload &amp; Drop</h3>
+                    <p class="feature-desc">Drag and drop packaging photos to decode plastic resin numbers, verify material cleanability, and view upcycling ideas.</p>
+                    <div class="feature-action-link">
+                        <span>Select Photo</span>
+                        <span class="link-arrow">→</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Voice -->
+                <div class="input-feature-card tilt-card reveal-on-scroll"
+                    onclick="switchTab('chatbot'); scrollToSection('panel-chatbot'); triggerVoicePrompt()">
+                    <div class="feature-card-glow"></div>
+                    <div class="feature-icon-badge">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">AI Voice &amp; Chat Copilot</h3>
+                    <p class="feature-desc">Ask conversational questions about tricky multi-material items, local deposit refunds, and food-soiled packaging rules.</p>
+                    <div class="feature-action-link">
+                        <span>Ask Question</span>
+                        <span class="link-arrow">→</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION E – HOW ECOSORT AI WORKS (PIPELINE)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="pipeline-section reveal-on-scroll" id="pipeline-section">
+            <div class="pipeline-bg-overlay">
+                <img src="{{ url_for('static', filename='images/sorting-plant.webp') }}"
+                    alt="Materials recovery facility sorting conveyor" class="pipeline-bg-img" width="1600"
+                    height="1200" loading="lazy">
+                <div class="pipeline-dark-wash"></div>
+            </div>
+
+            <div class="pipeline-inner">
+                <div class="section-header reveal-on-scroll">
+                    <span class="section-tag">Edge AI Architecture</span>
+                    <h2 class="section-title">How EcoSort AI Works</h2>
+                    <p class="section-subtitle">A high-performance pipeline spanning perception, embedded inference, and
+                        generative guidance</p>
+                </div>
+
+                <div class="pipeline-steps-track">
+                    <!-- SVG self-drawing connecting line -->
+                    <div class="pipeline-connector-line" aria-hidden="true"></div>
+
+                    <!-- Step 1 -->
+                    <div class="pipeline-node reveal-child">
+                        <div class="node-icon-box">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="node-step-tag">Step 01</div>
+                        <h4 class="node-title">Multimodal Input</h4>
+                        <p class="node-desc">Captures live webcam frames, uploaded photos, or spoken queries.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="pipeline-node reveal-child">
+                        <div class="node-icon-box">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="node-step-tag">Step 02</div>
+                        <h4 class="node-title">Computer Vision</h4>
+                        <p class="node-desc">Custom YOLOv8 identifies objects and calculates localization bounding
+                            boxes.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="pipeline-node reveal-child">
+                        <div class="node-icon-box">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                <rect x="9" y="9" width="6" height="6"></rect>
+                                <line x1="9" y1="1" x2="9" y2="4"></line>
+                                <line x1="15" y1="1" x2="15" y2="4"></line>
+                                <line x1="9" y1="20" x2="9" y2="23"></line>
+                                <line x1="15" y1="20" x2="15" y2="23"></line>
+                                <line x1="20" y1="9" x2="23" y2="9"></line>
+                                <line x1="20" y1="14" x2="23" y2="14"></line>
+                                <line x1="1" y1="9" x2="4" y2="9"></line>
+                                <line x1="1" y1="14" x2="4" y2="14"></line>
+                            </svg>
+                        </div>
+                        <div class="node-step-tag">Step 03</div>
+                        <h4 class="node-title">Llama 1B Reasoning</h4>
+                        <p class="node-desc">On-device LLM evaluates resin codes, hazard matrix, and environmental
+                            context.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="pipeline-node reveal-child">
+                        <div class="node-icon-box">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" />
+                                <path d="M11 19h8.2a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0 0-1.8L17 9" />
+                                <path d="m11 2 4.5 8h-9z" />
+                            </svg>
+                        </div>
+                        <div class="node-step-tag">Step 04</div>
+                        <h4 class="node-title">Action Guidance</h4>
+                        <p class="node-desc">Delivers actionable Empty &rarr; Rinse &rarr; Recycle or creative reuse
+                            steps.</p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="pipeline-node reveal-child">
+                        <div class="node-icon-box">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="node-step-tag">Step 05</div>
+                        <h4 class="node-title">Impact Telemetry</h4>
+                        <p class="node-desc">Logs segregation stats, CO2 offsets, and landfill diversion into SQLite DB.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION 5 – RESIN IDENTIFICATION CODE (RIC) EXPLORER (#1 to #7)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="section-container resin-explorer-section reveal-on-scroll" id="resin-explorer">
+            <div class="section-header">
+                <span class="section-tag">Standardized Polymer Classification</span>
+                <h2 class="section-title">Resin Identification Code (RIC) Explorer</h2>
+                <p class="section-subtitle">
+                    Created by the Society of the Plastics Industry (SPI) and codified in ASTM D7611.
+                    Select any resin standard from #1 to #7 to inspect recyclability level, commodity market value, and critical contamination safeguards.
+                </p>
+            </div>
+
+            <!-- Dial Selector Strip -->
+            <div class="resin-dial-strip" role="tablist" aria-label="Resin Identification Codes #1 through #7">
+                <button class="resin-dial-btn active" data-ric="1" onclick="selectResinCode(1)" role="tab" aria-selected="true" aria-controls="resinDisplayPanel" id="resinTab1">
+                    <span class="dial-triangle">♳</span>
+                    <span class="dial-code">#1</span>
+                    <span class="dial-abbr">PET</span>
+                    <span class="dial-status-dot dot-cyan" title="Universally Recyclable · High Value"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="2" onclick="selectResinCode(2)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab2">
+                    <span class="dial-triangle">♴</span>
+                    <span class="dial-code">#2</span>
+                    <span class="dial-abbr">HDPE</span>
+                    <span class="dial-status-dot dot-emerald" title="Universally Recyclable · High Value"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="3" onclick="selectResinCode(3)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab3">
+                    <span class="dial-triangle">♵</span>
+                    <span class="dial-code">#3</span>
+                    <span class="dial-abbr">PVC</span>
+                    <span class="dial-status-dot dot-rose" title="Rarely Curbside · Contaminant"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="4" onclick="selectResinCode(4)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab4">
+                    <span class="dial-triangle">♶</span>
+                    <span class="dial-code">#4</span>
+                    <span class="dial-abbr">LDPE</span>
+                    <span class="dial-status-dot dot-sky" title="Store Drop-Off Only"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="5" onclick="selectResinCode(5)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab5">
+                    <span class="dial-triangle">♷</span>
+                    <span class="dial-code">#5</span>
+                    <span class="dial-abbr">PP</span>
+                    <span class="dial-status-dot dot-lime" title="Widely Accepted"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="6" onclick="selectResinCode(6)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab6">
+                    <span class="dial-triangle">♸</span>
+                    <span class="dial-code">#6</span>
+                    <span class="dial-abbr">PS</span>
+                    <span class="dial-status-dot dot-amber" title="Rarely Curbside · Microplastic Hazard"></span>
+                </button>
+                <button class="resin-dial-btn" data-ric="7" onclick="selectResinCode(7)" role="tab" aria-selected="false" aria-controls="resinDisplayPanel" id="resinTab7">
+                    <span class="dial-triangle">♹</span>
+                    <span class="dial-code">#7</span>
+                    <span class="dial-abbr">OTHER</span>
+                    <span class="dial-status-dot dot-violet" title="Specialized Facility Only"></span>
+                </button>
+            </div>
+
+            <!-- Dynamic Active Specimen Card -->
+            <div class="card glass-card resin-detail-card" id="resinDisplayPanel" role="tabpanel" aria-labelledby="resinTab1">
+                <div class="resin-card-header">
+                    <div class="resin-emblem-wrap">
+                        <span class="resin-giant-symbol" id="resinEmblem">♳</span>
+                        <div class="resin-emblem-meta">
+                            <div class="resin-code-tag" id="resinCodeBadge">RIC #1 · ASTM D7611</div>
+                            <h3 class="resin-fullname" id="resinFullName">Polyethylene Terephthalate (PET / PETE)</h3>
+                        </div>
+                    </div>
+                    <div class="resin-verdict-badge badge-high-value" id="resinVerdictBadge">
+                        <span class="verdict-dot"></span>
+                        <span id="resinVerdictText">Most Valuable · Curbside Accepted</span>
+                    </div>
+                </div>
+
+                <div class="resin-specs-grid">
+                    <div class="resin-spec-box">
+                        <span class="spec-label">Everyday Packaging</span>
+                        <p class="spec-val" id="resinProducts">Single-use water bottles, carbonated soft drinks, cooking oil bottles, peanut butter jars, clear food trays.</p>
+                    </div>
+                    <div class="resin-spec-box">
+                        <span class="spec-label">Secondary Circular Market</span>
+                        <p class="spec-val" id="resinCircularMarket">Remelted into rPET food-grade resin, polyester fleece jackets, industrial strapping, and thermal fiberfill.</p>
+                    </div>
+                    <div class="resin-spec-box highlight-box">
+                        <span class="spec-label">Empty &rarr; Rinse &rarr; Recycle Protocol</span>
+                        <p class="spec-val" id="resinPrepTip">Empty all residual beverages and lightly rinse. Keep the cap screwed on tight so it does not slip through MRF optical sorting screens.</p>
+                    </div>
+                    <div class="resin-spec-box alert-box">
+                        <span class="spec-label">Contamination Hazard</span>
+                        <p class="spec-val" id="resinContaminationWarning">Unrinsed sugar syrups degrade remelted optical clarity. Even 0.1% PVC contamination ruins entire 10-ton PET batches.</p>
+                    </div>
+                </div>
+
+                <div class="resin-card-footer">
+                    <div class="resin-footer-stat">
+                        <span class="stat-bullet">&bull;</span>
+                        <span id="resinEconomicStat"><strong>Commodity Pricing:</strong> High market demand ($450–$620 per metric ton sorted clear flake).</span>
+                    </div>
+                    <button class="btn btn-sm btn-ghost-lime" onclick="loadSampleImage('/static/images/hero-bottles.webp', 'PET Bottle #1'); scrollToSection('scanner-section');">
+                        <span>Test PET Specimen in Scanner</span> &rarr;
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION 6 – STUDENT & PROFESSIONAL KNOWLEDGE MODULE
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="section-container educational-guide-section reveal-on-scroll" id="jargon-guide">
+            <div class="section-header">
+                <span class="section-tag">🎓 Student &amp; Professional Knowledge System</span>
+                <h2 class="section-title">Demystifying AI &amp; Circular Standards</h2>
+                <p class="section-subtitle">
+                    Essential engineering foundations bridging deep-learning computer vision, polymer chemistry, and industrial recovery facility operations.
+                </p>
+
+                <!-- Track Filter Controls -->
+                <div class="guide-filter-strip" role="tablist" aria-label="Educational Track Filters">
+                    <button class="guide-filter-btn active" data-filter="all" onclick="filterEducationalTrack('all')" role="tab" aria-selected="true">
+                        <span>All Modules (4)</span>
+                    </button>
+                    <button class="guide-filter-btn" data-filter="academic" onclick="filterEducationalTrack('academic')" role="tab" aria-selected="false">
+                        <span class="track-dot dot-cyan"></span>
+                        <span>Academic &amp; AI Core</span>
+                    </button>
+                    <button class="guide-filter-btn" data-filter="industrial" onclick="filterEducationalTrack('industrial')" role="tab" aria-selected="false">
+                        <span class="track-dot dot-emerald"></span>
+                        <span>Industrial &amp; Materials Standards</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="educational-grid" id="educationalGrid">
+                <!-- Card 01: YOLOv8 (Academic Track) -->
+                <div class="educational-card academic-card" data-track="academic">
+                    <div class="edu-card-top">
+                        <div class="edu-track-badge badge-academic">
+                            <span class="track-dot dot-cyan"></span>
+                            <span>ACADEMIC TRACK · NEURAL VISION</span>
+                        </div>
+                        <div class="edu-icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                                <line x1="12" y1="3" x2="12" y2="6"></line>
+                                <line x1="12" y1="18" x2="12" y2="21"></line>
+                                <line x1="3" y1="12" x2="6" y2="12"></line>
+                                <line x1="18" y1="12" x2="21" y2="12"></line>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-body">
+                        <span class="edu-concept-num">MODULE // 01</span>
+                        <h3 class="edu-card-title">What is YOLOv8?</h3>
+                        <p class="edu-card-subtitle">Single-Forward-Pass Deep Neural Object Detection</p>
+                        
+                        <p class="edu-card-desc">
+                            <strong>YOLO</strong> stands for <em>"You Only Look Once"</em>. Unlike traditional computer algorithms that scan an image piece-by-piece, YOLOv8 passes the whole picture through a deep neural network once in milliseconds. It spots objects (bottles, cans, paper) and draws tight coordinate bounding boxes around them instantly.
+                        </p>
+
+                        <div class="edu-metrics-strip">
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Inference Latency</span>
+                                <span class="metric-val">&lt; 15 ms</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Architecture</span>
+                                <span class="metric-val">CSP-Darknet + SPPF</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Resolution</span>
+                                <span class="metric-val">640×640 Tensor</span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Technical Drawer -->
+                        <div class="guide-spec-drawer hidden" id="specDrawer1">
+                            <div class="spec-drawer-content">
+                                <h5>Technical Specification &amp; Architecture:</h5>
+                                <ul>
+                                    <li><strong>Anchor-Free Detection:</strong> Eliminates predefined anchor boxes, predicting object centers directly for higher accuracy on squished and deformed waste.</li>
+                                    <li><strong>Edge Optimization:</strong> Exported to ONNX and OpenVINO formats for zero-lag CPU and NPU acceleration without discrete GPU requirement.</li>
+                                    <li><strong>Confidence Threshold:</strong> Configured at 0.50 minimum intersection-over-union (IoU) to prevent false-positive contamination alerts.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-footer">
+                        <button class="edu-toggle-btn" onclick="toggleGuideDrawer(1, this)" aria-expanded="false" aria-controls="specDrawer1">
+                            <span class="btn-text">Technical Specification</span>
+                            <span class="btn-icon">&plus;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 02: Resin Identification Codes (Industrial Track) -->
+                <div class="educational-card industrial-card" data-track="industrial">
+                    <div class="edu-card-top">
+                        <div class="edu-track-badge badge-industrial">
+                            <span class="track-dot dot-emerald"></span>
+                            <span>INDUSTRIAL STANDARD · ASTM D7611</span>
+                        </div>
+                        <div class="edu-icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <polyline points="23 20 23 14 17 14"></polyline>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-body">
+                        <span class="edu-concept-num">MODULE // 02</span>
+                        <h3 class="edu-card-title">What are Resin Codes (RIC #1–#7)?</h3>
+                        <p class="edu-card-subtitle">Polymer Chemistry vs. Municipal Collectibility</p>
+                        
+                        <p class="edu-card-desc">
+                            Molded into almost every commercial plastic package is a triangle arrow symbol with a number from <strong>1 to 7</strong>. <strong>#1 (PET)</strong> and <strong>#2 (HDPE)</strong> are the most valuable and easiest to melt into new products. <strong>#3 (PVC)</strong> and <strong>#6 (Styrofoam)</strong> rarely belong in household curbside bins because they degrade or release chemicals when melted.
+                        </p>
+
+                        <div class="edu-metrics-strip">
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Codification</span>
+                                <span class="metric-val">ASTM D7611 / ISO</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">High-Value Resins</span>
+                                <span class="metric-val">#1 (PET) &amp; #2 (HDPE)</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Curbside Hazard</span>
+                                <span class="metric-val">#3 (PVC) &amp; #6 (PS)</span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Technical Drawer -->
+                        <div class="guide-spec-drawer hidden" id="specDrawer2">
+                            <div class="spec-drawer-content">
+                                <h5>Technical Specification &amp; Architecture:</h5>
+                                <ul>
+                                    <li><strong>Density Float-Sink Separation:</strong> Industrial MRFs separate shredded plastics by density: PET (1.38 g/cm³) sinks in water tanks, while HDPE (0.95 g/cm³) and PP (0.90 g/cm³) float.</li>
+                                    <li><strong>Cross-Polymer Degradation:</strong> If PVC (1.40 g/cm³) mixes into PET, it decomposes at PET processing temperatures (260°C), generating corrosive hydrochloric acid that destroys equipment.</li>
+                                    <li><strong>Secondary rPET Market:</strong> Mechanically washed clear flake sells for $450–$620/ton to produce food-grade packaging and polyester fibers.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-footer">
+                        <button class="edu-toggle-btn" onclick="toggleGuideDrawer(2, this)" aria-expanded="false" aria-controls="specDrawer2">
+                            <span class="btn-text">Technical Specification</span>
+                            <span class="btn-icon">&plus;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 03: Llama 1B On-Device (Academic Track) -->
+                <div class="educational-card academic-card" data-track="academic">
+                    <div class="edu-card-top">
+                        <div class="edu-track-badge badge-academic">
+                            <span class="track-dot dot-cyan"></span>
+                            <span>ACADEMIC TRACK · EDGE REASONING</span>
+                        </div>
+                        <div class="edu-icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                <rect x="9" y="9" width="6" height="6"></rect>
+                                <line x1="9" y1="1" x2="9" y2="4"></line>
+                                <line x1="15" y1="1" x2="15" y2="4"></line>
+                                <line x1="9" y1="20" x2="9" y2="23"></line>
+                                <line x1="15" y1="20" x2="15" y2="23"></line>
+                                <line x1="20" y1="9" x2="23" y2="9"></line>
+                                <line x1="20" y1="14" x2="23" y2="14"></line>
+                                <line x1="1" y1="9" x2="4" y2="9"></line>
+                                <line x1="1" y1="14" x2="4" y2="14"></line>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-body">
+                        <span class="edu-concept-num">MODULE // 03</span>
+                        <h3 class="edu-card-title">What is Llama 1B On-Device?</h3>
+                        <p class="edu-card-subtitle">Quantized Generative Material Intelligence</p>
+                        
+                        <p class="edu-card-desc">
+                            A compact Large Language Model with 1 billion parameters optimized to execute locally on standard processors. It acts like an interactive recycling encyclopedia that answers segregation questions, provides DIY upcycling projects, and clarifies city rules without sending private data to external cloud servers.
+                        </p>
+
+                        <div class="edu-metrics-strip">
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Parameter Count</span>
+                                <span class="metric-val">1.23 Billion Weights</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">RAM Footprint</span>
+                                <span class="metric-val">~1.2 GB (INT4)</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Privacy Boundary</span>
+                                <span class="metric-val">100% Zero Egress</span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Technical Drawer -->
+                        <div class="guide-spec-drawer hidden" id="specDrawer3">
+                            <div class="spec-drawer-content">
+                                <h5>Technical Specification &amp; Architecture:</h5>
+                                <ul>
+                                    <li><strong>4-Bit Group-Wise Quantization:</strong> Reduces model weights from 16-bit FP16 to 4-bit integer tensors without losing semantic discernment of packaging polymers.</li>
+                                    <li><strong>Zero Cloud Telemetry:</strong> All video frames, embeddings, and chat prompts remain strictly inside browser and host memory—never transmitted to external servers.</li>
+                                    <li><strong>Contextual Action Synthesis:</strong> Automatically combines YOLO detection labels with municipal bylaws (Munich Pfand, California SB 54, Tokyo 3-Stream) to give tailored disposal guidance.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-footer">
+                        <button class="edu-toggle-btn" onclick="toggleGuideDrawer(3, this)" aria-expanded="false" aria-controls="specDrawer3">
+                            <span class="btn-text">Technical Specification</span>
+                            <span class="btn-icon">&plus;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 04: Contamination Safeguards (Industrial Track) -->
+                <div class="educational-card industrial-card" data-track="industrial">
+                    <div class="edu-card-top">
+                        <div class="edu-track-badge badge-industrial">
+                            <span class="track-dot dot-emerald"></span>
+                            <span>INDUSTRIAL STANDARD · RECOVERY OPERATIONS</span>
+                        </div>
+                        <div class="edu-icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-body">
+                        <span class="edu-concept-num">MODULE // 04</span>
+                        <h3 class="edu-card-title">Why Does Bin Contamination Matter?</h3>
+                        <p class="edu-card-subtitle">Protecting Commodity Bale Purity from Landfill Diversion</p>
+                        
+                        <p class="edu-card-desc">
+                            If someone tosses greasy takeout boxes or unrinsed milk jugs into a recycling bin, food fats and residual liquids soak into clean paper and cardboard fibers. This "contamination" ruins recycling batches, causing entire truckloads to be diverted to landfills or incinerators.
+                        </p>
+
+                        <div class="edu-metrics-strip">
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Max Tolerance</span>
+                                <span class="metric-val">&lt; 5% Contamination</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Failure Mode</span>
+                                <span class="metric-val">Fiber Oil Saturation</span>
+                            </div>
+                            <div class="edu-metric-item">
+                                <span class="metric-lbl">Consequence</span>
+                                <span class="metric-val">10-Ton Bale Rejection</span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Technical Drawer -->
+                        <div class="guide-spec-drawer hidden" id="specDrawer4">
+                            <div class="spec-drawer-content">
+                                <h5>Technical Specification &amp; Architecture:</h5>
+                                <ul>
+                                    <li><strong>The Grease Problem:</strong> Paper recycling uses water slurry baths. Oil and grease do not dissolve in water; they bond to paper fibers, creating oily spots that weaken cardboard structural integrity.</li>
+                                    <li><strong>Optical Sorter Confusion:</strong> Greasy or crushed multi-layer cartons fool Near-Infrared (NIR) optical sensors, causing misdirection into the wrong processing streams.</li>
+                                    <li><strong>The Economic Impact:</strong> A single contaminated MRF bale costs municipal sorting facilities $2,000+ in transport fines and landfill tipping fees.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-card-footer">
+                        <button class="edu-toggle-btn" onclick="toggleGuideDrawer(4, this)" aria-expanded="false" aria-controls="specDrawer4">
+                            <span class="btn-text">Technical Specification</span>
+                            <span class="btn-icon">&plus;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION D – WASTE CATEGORIES GRID (From Real Model & Advisor)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="section-container" id="categories-section">
+            <div class="section-header reveal-on-scroll">
+                <span class="section-tag">Material Science</span>
+                <h2 class="section-title">Waste Categories & Segregation Standards</h2>
+                <p class="section-subtitle">Real materials recognized by our YOLO model and Llama 1B knowledge base</p>
+
+                <!-- Filter Chips -->
+                <div class="category-filter-chips">
+                    <button class="filter-chip active" data-filter="all" onclick="filterCategories('all')">All
+                        Classes</button>
+                    <button class="filter-chip" data-filter="recyclable"
+                        onclick="filterCategories('recyclable')">Recyclables</button>
+                    <button class="filter-chip" data-filter="special" onclick="filterCategories('special')">Special
+                        Handling</button>
+                </div>
+            </div>
+
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Category 1: Plastic -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="recyclable"
+                    onclick="openCategoryModal('plastic')">
+                    <div class="category-img-wrap">
+                        <img src="{{ url_for('static', filename='images/hero-bottles.webp') }}"
+                            alt="Bales of sorted plastic bottles for recycling" class="category-img" width="1200"
+                            height="900" loading="lazy">
+                        <span class="category-badge badge-green">Recyclable (RIC #1, #2, #5)</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Plastic &amp; Polymers</h3>
+                            <span class="category-code-chip">RIC #1–#7</span>
+                        </div>
+                        <p class="category-tip">Rinse containers, crush to save bin space, and remove food oils before
+                            recycling.</p>
+
+                        <!-- Interactive Expandable Drawer revealed on hover/focus -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Empty</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. Rinse</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. Crush</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">🌱 Circular Impact</span>
+                                <p class="impact-text">Recycling 1 ton saves 5,774 kWh energy &amp; 16.3 bbl of crude
+                                    oil.</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Decomposition: 450–1000 yrs</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 2: Cardboard & Paper -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="recyclable"
+                    onclick="openCategoryModal('recyclable')">
+                    <div class="category-img-wrap">
+                        <img src="{{ url_for('static', filename='images/cardboard-paper.webp') }}"
+                            alt="Recycled cardboard bales ready for paper mill" class="category-img" width="1600"
+                            height="1066" loading="lazy">
+                        <span class="category-badge badge-green">Recyclable (Paper & Cardboard)</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Paper &amp; Cardboard</h3>
+                            <span class="category-code-chip">Fiber #20–#22</span>
+                        </div>
+                        <p class="category-tip">Keep strictly dry; flatten boxes. Remove synthetic adhesive tape and
+                            plastic film.</p>
+
+                        <!-- Interactive Expandable Drawer -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Keep Dry</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. Remove Tape</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. Flatten</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">🌳 Forest Preservation</span>
+                                <p class="impact-text">1 ton of cardboard saves 17 mature trees &amp; 26,000L fresh
+                                    water.</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Decomposition: 2–6 weeks</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 3: Metal Cans -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="recyclable"
+                    onclick="openCategoryModal('metal')">
+                    <div class="category-img-wrap">
+                        <img src="{{ url_for('static', filename='images/metal-cans.webp') }}"
+                            alt="Sorted aluminum cans for metal recycling" class="category-img" width="1024"
+                            height="768" loading="lazy">
+                        <span class="category-badge badge-green">Infinitely Recyclable</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Metal &amp; Aluminum</h3>
+                            <span class="category-code-chip">ALU #41 / FE #40</span>
+                        </div>
+                        <p class="category-tip">Rinse food residue. Recycling aluminum saves 95% of energy needed for
+                            new metal.</p>
+
+                        <!-- Interactive Expandable Drawer -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Rinse Food</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. Dry Can</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. Blue Bin</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">⚡ 95% Energy Offset</span>
+                                <p class="impact-text">Can be remelted indefinitely with 0% loss in structural tensile
+                                    strength.</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Decomposition: 50–200 yrs</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 4: Glass -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="recyclable"
+                    onclick="openCategoryModal('glass')">
+                    <div class="category-img-wrap">
+                        <img src="{{ url_for('static', filename='images/glass-bottles.webp') }}"
+                            alt="Sorted glass bottles collected in Tokyo" class="category-img" width="1600" height="418"
+                            loading="lazy">
+                        <span class="category-badge badge-green">100% Recyclable</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Glass Containers</h3>
+                            <span class="category-code-chip">GL #70–#72</span>
+                        </div>
+                        <p class="category-tip">Rinse jars and bottles. Infinitely recyclable without loss in chemical
+                            purity.</p>
+
+                        <!-- Interactive Expandable Drawer -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Remove Caps</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. Swirl Rinse</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. Glass Bank</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">🔄 100% Infinite Cycle</span>
+                                <p class="impact-text">Saves 1.2 tons raw sand and eliminates 315 kg CO2 emission per
+                                    ton.</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Decomposition: 1M+ yrs</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 5: Wet & Organic Waste -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="special"
+                    onclick="openCategoryModal('wet_waste')">
+                    <div class="category-img-wrap category-gradient-wrap wet-gradient">
+                        <div class="category-svg-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a9 9 0 0 1 9 9c0 5-4 9-9 9s-9-4-9-9a9 9 0 0 1 9-9z"></path>
+                                <path d="M12 12c-2 0-3 2-3 4"></path>
+                                <path d="M12 12c2 0 3 2 3 4"></path>
+                            </svg>
+                        </div>
+                        <span class="category-badge badge-teal">Compostable</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Wet &amp; Organic Waste</h3>
+                            <span class="category-code-chip">Bio-Organic</span>
+                        </div>
+                        <p class="category-tip">Keep separate from plastics and dry items. Ideal for home composting and
+                            biogas.</p>
+
+                        <!-- Interactive Expandable Drawer -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Drain Liquid</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. No Plastics</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. Green Bin</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">🌱 Methane Abatement</span>
+                                <p class="impact-text">Composting prevents anaerobic decomposition in landfills (28x
+                                    methane cut).</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Decomposition: 1–6 months</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 6: Hazardous & E-Waste -->
+                <div class="category-card reveal-on-scroll interactive-card" data-category="special"
+                    onclick="openCategoryModal('hazardous')">
+                    <div class="category-img-wrap category-gradient-wrap hazard-gradient">
+                        <div class="category-svg-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon
+                                    points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                </polygon>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <span class="category-badge badge-red">Special Hazardous Facility</span>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-header-row">
+                            <h3 class="category-name">Hazardous &amp; E-Waste</h3>
+                            <span class="category-code-chip">WEEE / Toxic</span>
+                        </div>
+                        <p class="category-tip">Never dispose in regular bins; drop off batteries and electronics at
+                            designated recycling hubs.</p>
+
+                        <!-- Interactive Expandable Drawer -->
+                        <div class="category-expand-drawer">
+                            <div class="drawer-divider"></div>
+                            <div class="drawer-section">
+                                <span class="drawer-section-title">Segregation Protocol:</span>
+                                <div class="drawer-steps-flow">
+                                    <span class="d-step">1. Tape Poles</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">2. Box Safely</span>
+                                    <span class="d-arrow">&rarr;</span>
+                                    <span class="d-step">3. E-Drop Hub</span>
+                                </div>
+                            </div>
+                            <div class="drawer-impact-box">
+                                <span class="impact-badge-tag">⚠️ Groundwater Shield</span>
+                                <p class="impact-text">Prevents lead, mercury, and lithium leaching into potable water
+                                    aquifers.</p>
+                            </div>
+                        </div>
+
+                        <div class="category-meta">
+                            <span>Hazard: Toxic Heavy Metals</span>
+                            <span class="learn-more-link">Inspect Standards &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION 8 – CIRCULAR IMPACT TELEMETRY & CONVERSION STANDARDS
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="section-container impact-counter-section reveal-on-scroll" id="impact-counter-section">
+            <div class="section-header">
+                <span class="section-tag">Circular Telemetry & Conversion Standards</span>
+                <h2 class="section-title">Measurable Environmental Impact per Ton</h2>
+                <p class="section-subtitle">
+                    Circular economy is physical science: conserved megawatt-hours, preserved old-growth canopies, and curtailed greenhouse gas emissions. Every figure is backed by documented lifecycle analyses.
+                </p>
+            </div>
+
+            <div class="impact-counter-grid">
+                <!-- Counter 1: Energy -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-cyan">ELECTRICITY PRESERVED</span>
+                        <span class="impact-source-badge" title="EPA Waste Reduction Model (WARM) v15">EPA WARM v15</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="5774">0</span>
+                        <span class="impact-unit">kWh / ton</span>
+                    </div>
+                    <div class="impact-material-label">Polyethylene Terephthalate (PET Plastic)</div>
+                    <p class="impact-card-desc">
+                        Recycling one ton of clean PET bottles saves 5,774 kWh of electrical grid energy—enough to power the average residential home for 6.5 consecutive months.
+                    </p>
+                </div>
+
+                <!-- Counter 2: Petroleum Crude Oil -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-emerald">CRUDE OIL AVOIDED</span>
+                        <span class="impact-source-badge" title="EPA WARM & Plastics Industry Association">EPA WARM</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="16.3" data-decimals="1">0</span>
+                        <span class="impact-unit">Barrels / ton</span>
+                    </div>
+                    <div class="impact-material-label">Mixed Polymer Resin Recovery</div>
+                    <p class="impact-card-desc">
+                        Conserves ~685 gallons of refined petroleum feedstocks per ton by directly substituting virgin polymer cracking with clean mechanical flake.
+                    </p>
+                </div>
+
+                <!-- Counter 3: Mature Trees Preserved -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-amber">FOREST CANOPY</span>
+                        <span class="impact-source-badge" title="EPA WasteWise Technical Factsheet">EPA WasteWise</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="17">0</span>
+                        <span class="impact-unit">Trees / ton</span>
+                    </div>
+                    <div class="impact-material-label">Corrugated Cardboard & Mixed Fiber</div>
+                    <p class="impact-card-desc">
+                        Every ton of segregated paperboard spares 17 mature timber trees, 7,000 gallons of industrial process water, and 3.3 cubic yards of landfill capacity.
+                    </p>
+                </div>
+
+                <!-- Counter 4: Aluminum Smelting Energy -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-violet">SMELTING POWER</span>
+                        <span class="impact-source-badge" title="The Aluminum Association Life Cycle Analysis">Aluminum Assoc.</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="95">0</span>
+                        <span class="impact-unit">% Cut</span>
+                    </div>
+                    <div class="impact-material-label">Aluminum UBC Can-to-Can Loop</div>
+                    <p class="impact-card-desc">
+                        Remelting scrap aluminum requires only 5% of the 14,000 kWh per ton required for bauxite ore smelting. Cans return to supermarket shelves in under 60 days.
+                    </p>
+                </div>
+
+                <!-- Counter 5: Quarry Minerals (Sand & Cullet) -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-cyan">RAW MINERALS</span>
+                        <span class="impact-source-badge" title="Glass Packaging Institute (GPI)">GPI Standard</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="1.2" data-decimals="1">0</span>
+                        <span class="impact-unit">Tons Saved</span>
+                    </div>
+                    <div class="impact-material-label">Flint, Amber & Emerald Glass Cullet</div>
+                    <p class="impact-card-desc">
+                        Each ton of recycled glass replaces 1.2 tons of virgin silica sand, soda ash, and limestone, reducing melting furnace kiln temperatures and emissions by 20%.
+                    </p>
+                </div>
+
+                <!-- Counter 6: Methane Mitigation -->
+                <div class="impact-card">
+                    <div class="impact-top-meta">
+                        <span class="impact-tag tag-rose">METHANE MITIGATION</span>
+                        <span class="impact-source-badge" title="IPCC AR6 Working Group III">IPCC AR6</span>
+                    </div>
+                    <div class="impact-figure-row">
+                        <span class="impact-number" data-target="28">0</span>
+                        <span class="impact-unit">&times; Potency Cut</span>
+                    </div>
+                    <div class="impact-material-label">Aerobic Organic Composting</div>
+                    <p class="impact-card-desc">
+                        Food scraps decaying anaerobically in landfills generate fugitive methane (CH4), a greenhouse gas 28 times more potent than carbon dioxide over a 100-year horizon.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECTION F – REAL DETECTION WORKSPACE (Preserving All 42 IDs)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="scanner-section" id="scanner-section">
+            <!-- Contextual Eco Background Blend -->
+            <div class="scanner-ambient-bg" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/sorting-bins.webp') }}" alt=""
+                    class="scanner-ambient-img" loading="lazy">
+                <div class="scanner-ambient-wash"></div>
+            </div>
+
+            <div class="section-header reveal-on-scroll">
+                <span class="section-tag">Perception Engine</span>
+                <h2 class="section-title">AI Waste Scanner & Object Estimation</h2>
+                <p class="section-subtitle">Real on-device YOLO detection with Llama 1B resin estimation</p>
+
+                <!-- Navigation Tabs Switcher (Preserving original onclick) -->
+                <div class="nav-tabs" id="navTabs">
+                    <button class="nav-tab active magnetic-btn" data-tab="detect" onclick="switchTab('detect')">
+                        <span class="tab-icon">
+                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </span>
+                        Detect
+                    </button>
+                    <button class="nav-tab magnetic-btn" data-tab="dashboard" onclick="switchTab('dashboard')">
+                        <span class="tab-icon">
+                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                        </span>
+                        Dashboard
+                    </button>
+                    <button class="nav-tab magnetic-btn" data-tab="records" onclick="switchTab('records')">
+                        <span class="tab-icon">
+                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                            </svg>
+                        </span>
+                        Records
+                    </button>
+                    <button class="nav-tab magnetic-btn" data-tab="chatbot" onclick="switchTab('chatbot')">
+                        <span class="tab-icon">
+                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <path d="M12 7v4"></path>
+                                <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                                <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                            </svg>
+                        </span>
+                        AI Advisor
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB PANEL: DETECT -->
+            <div class="tab-panel active" id="panel-detect">
+                <!-- AI Pipeline Banner -->
+                <div class="ai-pipeline-banner">
+                    <div class="pipeline-step">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                            </path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span>Multimodal Input</span>
+                    </div>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <div class="pipeline-step">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
+                        <span>YOLOv8 Vision</span>
+                    </div>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <div class="pipeline-step highlight">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                            <rect x="9" y="9" width="6" height="6"></rect>
+                            <line x1="9" y1="1" x2="9" y2="4"></line>
+                            <line x1="15" y1="1" x2="15" y2="4"></line>
+                            <line x1="9" y1="20" x2="9" y2="23"></line>
+                            <line x1="15" y1="20" x2="15" y2="23"></line>
+                            <line x1="20" y1="9" x2="23" y2="9"></line>
+                            <line x1="20" y1="14" x2="23" y2="14"></line>
+                            <line x1="1" y1="9" x2="4" y2="9"></line>
+                            <line x1="1" y1="14" x2="4" y2="14"></line>
+                        </svg>
+                        <span>Llama 1B Reasoning</span>
+                    </div>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <div class="pipeline-step">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <polyline points="23 20 23 14 17 14"></polyline>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                        </svg>
+                        <span>Smart Recommendation</span>
+                    </div>
+                </div>
+
+                <div class="detect-grid">
+                    <!-- Left: Input Area -->
+                    <div class="detect-input">
+                        <div class="card glass-card">
+                            <div class="card-header">
+                                <h2>
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                        </path>
+                                        <circle cx="12" cy="13" r="4"></circle>
+                                    </svg>
+                                    Waste Scanner
+                                </h2>
+                                <div class="mode-switch">
+                                    <button class="mode-btn active magnetic-btn" id="btnGallery"
+                                        onclick="setMode('gallery')">
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                        </svg>
+                                        Gallery
+                                    </button>
+                                    <button class="mode-btn magnetic-btn" id="btnWebcam" onclick="setMode('webcam')">
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                        </svg>
+                                        Webcam
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Gallery Mode -->
+                            <div class="input-area" id="galleryMode">
+                                <div class="drop-zone" id="dropZone"
+                                    ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                                    ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event)">
+                                    <div class="drop-icon">
+                                        <svg class="drop-zone-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    <p class="drop-text">Drop waste image here</p>
+                                    <p class="drop-sub">or click to browse from device</p>
+                                    <input type="file" id="fileInput" accept="image/*"
+                                        onchange="handleFileSelect(event)" hidden>
+                                </div>
+                                <button id="btnSelectImage" class="btn btn-full btn-select-image"
+                                    onclick="document.getElementById('fileInput').click()">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                        </path>
+                                    </svg>
+                                    Select Image
+                                </button>
+                            </div>
+
+                            <!-- Webcam Mode -->
+                            <div class="input-area hidden" id="webcamMode">
+                                <div class="webcam-container" id="webcamContainer">
+                                    <!-- 2D Laser Scanning Line HUD Overlay -->
+                                    <div class="live-scan-hud" id="webcamScanHud" aria-hidden="true">
+                                        <div class="scan-hud-grid"></div>
+                                        <div class="scan-laser-line"></div>
+                                        <div class="scan-reticle-corner reticle-tl"></div>
+                                        <div class="scan-reticle-corner reticle-tr"></div>
+                                        <div class="scan-reticle-corner reticle-bl"></div>
+                                        <div class="scan-reticle-corner reticle-br"></div>
+                                        <div class="scan-status-text">
+                                            <span class="scan-blinker"></span>
+                                            <span class="scan-hud-label">YOLOv8 PERCEPTION SCANNING</span>
+                                        </div>
+                                    </div>
+                                    <img id="webcamFeed" src="" alt="Webcam Feed" class="webcam-feed">
+                                    <div class="webcam-overlay" id="webcamOverlay">
+                                        <div class="webcam-placeholder">
+                                            <div class="camera-icon">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                                </svg>
+                                            </div>
+                                            <p>Click "Start Webcam" to begin</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="webcam-controls">
+                                    <button class="btn btn-primary magnetic-btn" id="btnStartCam"
+                                        onclick="startWebcam()">
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                        </svg>
+                                        Start Webcam
+                                    </button>
+                                    <button class="btn btn-accent magnetic-btn" id="btnCapture" onclick="captureFrame()"
+                                        disabled>
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+                                            <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+                                            <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+                                            <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+                                            <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+                                            <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+                                        </svg>
+                                        Capture &amp; Detect
+                                    </button>
+                                    <button class="btn btn-secondary magnetic-btn" id="btnStopCam"
+                                        onclick="stopWebcam()" disabled>
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                        </svg>
+                                        Stop
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Preview of uploaded image -->
+                            <div class="preview-area hidden" id="previewArea">
+                                <div class="preview-img-container" id="previewImgContainer">
+                                    <!-- 2D Laser Scanning Line HUD Overlay -->
+                                    <div class="live-scan-hud" id="previewScanHud" aria-hidden="true">
+                                        <div class="scan-hud-grid"></div>
+                                        <div class="scan-laser-line"></div>
+                                        <div class="scan-reticle-corner reticle-tl"></div>
+                                        <div class="scan-reticle-corner reticle-tr"></div>
+                                        <div class="scan-reticle-corner reticle-bl"></div>
+                                        <div class="scan-reticle-corner reticle-br"></div>
+                                        <div class="scan-status-text">
+                                            <span class="scan-blinker"></span>
+                                            <span class="scan-hud-label">ANALYZING POLYMER MATRIX...</span>
+                                        </div>
+                                    </div>
+                                    <img id="previewImage" src=""
+                                        alt="User-uploaded waste material preview for AI analysis"
+                                        onclick="openImageLightbox(this.src)" title="Click to view full screen"
+                                        style="cursor: pointer;">
+                                </div>
+                                <button class="btn btn-accent btn-full magnetic-btn btn-pulse" onclick="analyzeImage()"
+                                    id="btnAnalyze">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    Analyze Waste
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Results & AI Cards -->
+                    <div class="detect-results">
+                        <div class="card glass-card">
+                            <div class="card-header">
+                                <h2>
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 2a10 10 0 0 1 10 10"></path>
+                                        <line x1="12" y1="12" x2="19" y2="5"></line>
+                                    </svg>
+                                    Detection Results
+                                </h2>
+                                <span class="inference-badge" id="inferenceBadge">—</span>
+                            </div>
+
+                            <div class="results-area" id="resultsArea">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <svg width="38" height="38" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                    </div>
+                                    <p>Upload an image or use webcam to detect waste</p>
+                                    <p class="empty-sub">AI will identify waste type and provide disposal guidance</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Object Estimation & Household Reuse Card -->
+                        <div class="card glass-card object-guess-card hidden" id="objectGuessCard">
+                            <div class="card-header">
+                                <div class="header-left-title">
+                                    <h2>
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <circle cx="12" cy="12" r="6"></circle>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                        </svg>
+                                        AI Object &amp; Material Estimation
+                                    </h2>
+                                </div>
+                                <span class="badge-accent" id="guessResinBadge">RIC #1 PET</span>
+                            </div>
+                            <div class="guess-content">
+                                <div class="guess-hero">
+                                    <div class="guess-title-wrap">
+                                        <span class="guess-label">Estimated Object:</span>
+                                        <h3 class="guess-name" id="guessObjectName">Single-Use Plastic Bottle</h3>
+                                        <p class="guess-sub" id="guessMaterialName">PET / PETE (Polyethylene
+                                            Terephthalate)</p>
+                                    </div>
+                                    <div class="powered-badge" id="llamaPoweredBadge">
+                                        <span class="llama-icon">
+                                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                                <rect x="9" y="9" width="6" height="6"></rect>
+                                                <line x1="9" y1="1" x2="9" y2="4"></line>
+                                                <line x1="15" y1="1" x2="15" y2="4"></line>
+                                                <line x1="9" y1="20" x2="9" y2="23"></line>
+                                                <line x1="15" y1="20" x2="15" y2="23"></line>
+                                                <line x1="20" y1="9" x2="23" y2="9"></line>
+                                                <line x1="20" y1="14" x2="23" y2="14"></line>
+                                                <line x1="1" y1="9" x2="4" y2="9"></line>
+                                                <line x1="1" y1="14" x2="4" y2="14"></line>
+                                            </svg>
+                                        </span>
+                                        Powered by Llama 1B
+                                    </div>
+                                </div>
+
+                                <!-- Action guidance step pills -->
+                                <div class="action-steps-row">
+                                    <div class="action-step-badge">
+                                        <span class="step-num-pill">1</span>
+                                        <span class="step-text-pill">Empty Contents</span>
+                                    </div>
+                                    <span class="action-arrow">&rarr;</span>
+                                    <div class="action-step-badge">
+                                        <span class="step-num-pill">2</span>
+                                        <span class="step-text-pill">Rinse Residue</span>
+                                    </div>
+                                    <span class="action-arrow">&rarr;</span>
+                                    <div class="action-step-badge highlight">
+                                        <span class="step-num-pill">3</span>
+                                        <span class="step-text-pill">Recycle / Upcycle</span>
+                                    </div>
+                                </div>
+
+                                <div class="guess-columns">
+                                    <div class="guess-col">
+                                        <h4>
+                                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="1 4 1 10 7 10"></polyline>
+                                                <polyline points="23 20 23 14 17 14"></polyline>
+                                                <path
+                                                    d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15">
+                                                </path>
+                                            </svg>
+                                            How to Recycle This Object:
+                                        </h4>
+                                        <ul class="recycle-list" id="guessRecycleList">
+                                        </ul>
+                                    </div>
+                                    <div class="guess-col">
+                                        <h4>
+                                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                            </svg>
+                                            Household Reuse Ideas:
+                                        </h4>
+                                        <ul class="reuse-list" id="guessReuseList">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Embedded AI Chatbot in Detect Tab -->
+                        <div class="card glass-card detect-chatbot-card" id="detectChatCard">
+                            <div class="card-header">
+                                <div class="chat-header-title">
+                                    <h2>
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                            <circle cx="12" cy="5" r="2"></circle>
+                                            <path d="M12 7v4"></path>
+                                            <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                                            <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                                        </svg>
+                                        AI Waste &amp; Household Reuse Advisor
+                                    </h2>
+                                    <span class="chat-status-pill" id="detectChatStatus">Context: Ready</span>
+                                </div>
+                            </div>
+
+                            <div class="chat-messages detect-chat-messages" id="detectChatMessages">
+                                <div class="chat-message bot">
+                                    <div class="message-avatar">
+                                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                            <circle cx="12" cy="5" r="2"></circle>
+                                            <path d="M12 7v4"></path>
+                                            <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                                            <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="message-bubble">
+                                        <p><strong>AI Waste Assistant Ready</strong></p>
+                                        <p>Scan an item with your webcam or drop a photo. I'll evaluate the material,
+                                            resin code, and provide <strong>creative household upcycling</strong>
+                                            suggestions.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detect Quick Chips -->
+                            <div class="quick-chips" id="detectQuickChips">
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('How do I recycle multi-material items like paper coffee cups or juice cartons?')">
+                                    <span class="chip-color-dot dot-cyan"></span>
+                                    Multi-Material Items
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('How do deposit refunds work for plastic bottles and aluminum cans?')">
+                                    <span class="chip-color-dot dot-emerald"></span>
+                                    Deposit Refunds
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('Can food-soiled packaging or greasy pizza boxes be recycled?')">
+                                    <span class="chip-color-dot dot-amber"></span>
+                                    Food-Soiled Packaging
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('How the item can be reused that I uploaded?')">
+                                    <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    </svg>
+                                    Household Reuse
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('How can this object be recycled?')">
+                                    <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10"></polyline>
+                                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15">
+                                        </path>
+                                    </svg>
+                                    How to Recycle
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('Guess what object it be and plastic type')">
+                                    <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    Guess Object
+                                </button>
+                                <button class="chip"
+                                    onclick="sendDetectQuickMessage('How long does this object take to decompose?')">
+                                    <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Decomposition
+                                </button>
+                            </div>
+
+                            <!-- Detect Chat Input -->
+                            <div class="chat-input-area">
+                                <input type="text" id="detectChatInput"
+                                    placeholder="Ask about household reuse, recycling, or plastic type..."
+                                    onkeydown="if(event.key==='Enter') sendDetectMessage()">
+                                <button class="btn btn-accent chat-send" onclick="sendDetectMessage()"
+                                    aria-label="Send message">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PANEL: DASHBOARD -->
+            <div class="tab-panel" id="panel-dashboard">
+                <div class="dashboard-grid">
+                    <!-- Stat Cards -->
+                    <div class="stat-card glass-card" id="statTotal">
+                        <div class="stat-icon">
+                            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                </path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value count-up" id="totalRecords">0</div>
+                        <div class="stat-label">Total Detections</div>
+                    </div>
+                    <div class="stat-card glass-card" id="statToday">
+                        <div class="stat-icon">
+                            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value count-up" id="todayRecords">0</div>
+                        <div class="stat-label">Today's Detections</div>
+                    </div>
+                    <div class="stat-card glass-card" id="statAlerts">
+                        <div class="stat-icon">
+                            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                                </path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value count-up" id="totalAlerts">0</div>
+                        <div class="stat-label">System Alerts</div>
+                    </div>
+                    <div class="stat-card glass-card" id="statHazardous">
+                        <div class="stat-icon">
+                            <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon
+                                    points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                </polygon>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-value count-up" id="hazardousCount">0</div>
+                        <div class="stat-label">Hazardous Items</div>
+                    </div>
+
+                    <!-- Distribution Chart -->
+                    <div class="card glass-card chart-card">
+                        <div class="card-header">
+                            <h2>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                                Waste Distribution
+                            </h2>
+                            <button class="btn btn-small" onclick="refreshDashboard()">
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15">
+                                    </path>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="chart-container" id="distributionChart">
+                            <div class="empty-state small">
+                                <p>No data yet — detect some waste first!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Alerts -->
+                    <div class="card glass-card alerts-card">
+                        <div class="card-header">
+                            <h2>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                Recent Alerts
+                            </h2>
+                        </div>
+                        <div class="alerts-list" id="alertsList">
+                            <div class="empty-state small">
+                                <p>No alerts</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documented Environmental Conversion Equivalencies -->
+                    <div class="card glass-card impact-standards-card" style="grid-column: 1 / -1; margin-top: 1rem;">
+                        <div class="card-header">
+                            <h2>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                </svg>
+                                Documented Environmental Conversion Standards
+                            </h2>
+                            <span class="engine-badge">EPA WARM &amp; WasteWise Grounded</span>
+                        </div>
+                        <div class="impact-standards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; padding: 1.25rem;">
+                            <div class="impact-metric-box" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                                    <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700;">RIC #1 &amp; #2 POLYMERS</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">EPA WARM v15</span>
+                                </div>
+                                <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">5,774 kWh / Ton</div>
+                                <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Each ton of sorted rigid plastic diverts 16.3 barrels of crude oil and mitigates 1.5 metric tons of CO2e.</p>
+                            </div>
+
+                            <div class="impact-metric-box" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                                    <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700;">ALUMINUM &amp; NON-FERROUS</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">Aluminum Assoc.</span>
+                                </div>
+                                <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">95% Energy Conserved</div>
+                                <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Recycling beverage cans prevents bauxite strip-mining, saving 14,000 kWh per metric ton produced.</p>
+                            </div>
+
+                            <div class="impact-metric-box" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                                    <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700;">FIBER &amp; CARDBOARD</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">EPA WasteWise</span>
+                                </div>
+                                <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">17 Trees Preserved / Ton</div>
+                                <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">1 ton of unsoiled corrugated fiberboard saves 7,000 gallons of water and 3.3 cubic yards of landfill.</p>
+                            </div>
+
+                            <div class="impact-metric-box" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                                    <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700;">CONTAINER GLASS CULLET</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">GPI Cullet Spec</span>
+                                </div>
+                                <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">1.2 Tons Raw Minerals</div>
+                                <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Infinite recyclability with zero quality loss; every ton saves silica sand, soda ash, and limestone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PANEL: RECORDS -->
+            <div class="tab-panel" id="panel-records">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h2>
+                            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                            </svg>
+                            Detection Records
+                        </h2>
+                        <div class="filter-controls">
+                            <select id="typeFilter" onchange="loadRecords()">
+                                <option value="">All Types</option>
+                                <option value="plastic">Plastic</option>
+                                <option value="recyclable">Recyclable</option>
+                                <option value="metal">Metal</option>
+                                <option value="dry_waste">Dry Waste</option>
+                                <option value="wet_waste">Wet Waste</option>
+                                <option value="hazardous">Hazardous</option>
+                            </select>
+                            <button class="btn btn-small" onclick="loadRecords()">
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15">
+                                    </path>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="recordsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Timestamp</th>
+                                    <th>Waste Type</th>
+                                    <th>Confidence</th>
+                                    <th>Humidity</th>
+                                    <th>Gas Level</th>
+                                    <th>Bin Fill</th>
+                                    <th>Hazardous</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recordsBody">
+                                <tr>
+                                    <td colspan="9" class="empty-cell">Loading records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PANEL: CHATBOT -->
+            <div class="tab-panel" id="panel-chatbot">
+                <div class="chatbot-layout">
+                    <div class="card glass-card chatbot-card">
+                        <div class="card-header">
+                            <div class="chat-header-main">
+                                <h2>
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                        <circle cx="12" cy="5" r="2"></circle>
+                                        <path d="M12 7v4"></path>
+                                        <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                                        <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                                    </svg>
+                                    EcoSort Llama 1B Recycling Advisor
+                                </h2>
+                                <span class="badge badge-green">On-Device Active</span>
+                            </div>
+                            <span class="engine-badge" id="engineBadgeInfo">Llama 3.2 1B</span>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Welcome message -->
+                            <div class="chat-message bot">
+                                <div class="message-avatar">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                        <circle cx="12" cy="5" r="2"></circle>
+                                        <path d="M12 7v4"></path>
+                                        <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                                        <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                                    </svg>
+                                </div>
+                                <div class="message-bubble">
+                                    <p>Hello! I'm your <strong>EcoSort Multimodal Assistant</strong> powered by
+                                        <strong>Llama 1B</strong>.</p>
+                                    <p>I can help you with:</p>
+                                    <ul>
+                                        <li><strong>Safe disposal rules</strong> for any common material</li>
+                                        <li><strong>Resin identification</strong> (PET #1 through OTHER #7)</li>
+                                        <li><strong>Creative household reuse &amp; upcycling ideas</strong></li>
+                                        <li><strong>Environmental footprint &amp; degradation timelines</strong></li>
+                                    </ul>
+                                    <p>Try asking: <em>"How do I dispose of a plastic container?"</em> or use the
+                                        microphone button below to speak!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Action Chips -->
+                        <div class="quick-chips">
+                            <button class="chip" onclick="sendQuickMessage('How to dispose of plastic bottles?')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M12 2a4 4 0 0 0-4 4v2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4z">
+                                    </path>
+                                </svg>
+                                Plastic Bottles
+                            </button>
+                            <button class="chip" onclick="sendQuickMessage('How to recycle paper and cardboard?')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                Cardboard
+                            </button>
+                            <button class="chip" onclick="sendQuickMessage('Where to throw rechargeable batteries?')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="1" y="6" width="18" height="12" rx="2"></rect>
+                                    <line x1="23" y1="11" x2="23" y2="13"></line>
+                                </svg>
+                                Batteries
+                            </button>
+                            <button class="chip" onclick="sendQuickMessage('What is waste segregation?')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15">
+                                    </path>
+                                </svg>
+                                Segregation Rules
+                            </button>
+                            <button class="chip"
+                                onclick="sendQuickMessage('How to start composting food waste at home?')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 2a9 9 0 0 1 9 9c0 5-4 9-9 9s-9-4-9-9a9 9 0 0 1 9-9z"></path>
+                                </svg>
+                                Composting
+                            </button>
+                            <button class="chip"
+                                onclick="sendQuickMessage('Give me creative household reuse ideas for plastic jars')">
+                                <svg class="ui-icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Household Reuse
+                            </button>
+                        </div>
+
+                        <!-- Voice Help / Permission Warning Banner (Hidden by default) -->
+                        <div class="voice-help-banner hidden" id="voiceHelpBanner">
+                            <div class="voice-help-header">
+                                <span class="voice-help-title">⚠️ Microphone Access Blocked</span>
+                                <button class="voice-help-close" onclick="closeVoiceHelp()" aria-label="Close message">&times;</button>
+                            </div>
+                            <div class="voice-help-content" id="voiceHelpContent"></div>
+                        </div>
+
+                        <!-- Voice Recording Status Indicator -->
+                        <div class="voice-status-bar hidden" id="voiceStatusBar">
+                            <div class="voice-status-pulse"></div>
+                            <span class="voice-status-text">Listening... Speak now</span>
+                            <div class="voice-status-actions">
+                                <button class="voice-send-btn" onclick="finishVoiceRecordingAndSend()" title="Done speaking — Send message">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </button>
+                                <button class="voice-stop-btn" onclick="cancelVoiceRecording()" title="Cancel voice input">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input with Voice integration -->
+                        <div class="chat-input-bar">
+                            <button class="chat-addon-btn voice-btn" id="voiceMicBtn" onclick="toggleVoiceRecording()"
+                                title="Speak to EcoSort - click to talk" aria-label="Voice input">
+                                <span class="mic-icon">
+                                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                                    </svg>
+                                </span>
+                            </button>
+                            <input type="text" id="chatInput"
+                                placeholder="Ask about recycling, resin codes, or household reuse..."
+                                onkeydown="if(event.key==='Enter') { lastInputWasVoice = false; sendMessage(); }">
+                            <button class="btn btn-accent chat-send" onclick="lastInputWasVoice = false; sendMessage()" aria-label="Send message">
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CATEGORY DETAIL MODAL DRAWER
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="modal-backdrop hidden" id="categoryModal" onclick="closeCategoryModal(event)">
+        <div class="modal-window glass-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeCategoryModal()" aria-label="Close modal">&times;</button>
+            <div class="modal-content" id="categoryModalContent">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         DETECTION IMAGE FULLSCREEN LIGHTBOX MODAL
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="lightbox-modal hidden" id="imageLightboxModal" onclick="closeImageLightbox(event)" role="dialog"
+        aria-modal="true" aria-label="Detection Image Detailed Fullscreen View">
+        <div class="lightbox-backdrop" onclick="closeImageLightbox(event)"></div>
+        <div class="lightbox-window" id="lightboxWindow" onclick="closeImageLightbox(event)">
+            <!-- Lightbox Header Controls -->
+            <div class="lightbox-header" onclick="event.stopPropagation()">
+                <div class="lightbox-title-wrap">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span class="lightbox-title" id="lightboxTitle">YOLO Detection Analysis — Detailed Inspection</span>
+                    <span class="lightbox-zoom-level" id="lightboxZoomLevel">100%</span>
+                </div>
+                <div class="lightbox-controls">
+                    <button class="lightbox-btn" onclick="zoomLightbox(0.25)" title="Zoom In (+)" aria-label="Zoom In">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                    </button>
+                    <button class="lightbox-btn" onclick="zoomLightbox(-0.25)" title="Zoom Out (-)"
+                        aria-label="Zoom Out">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                    </button>
+                    <button class="lightbox-btn" onclick="resetLightboxZoom()" title="Reset Zoom (1:1)"
+                        aria-label="Reset Zoom">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <polyline points="3 3 3 8 8 8"></polyline>
+                        </svg>
+                    </button>
+                    <a class="lightbox-btn" id="lightboxDownloadBtn" href="" download="ecosort-detection-result.jpg"
+                        title="Download Image" aria-label="Download Image">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </a>
+                    <button class="lightbox-btn lightbox-close-btn" onclick="closeImageLightbox()"
+                        title="Close Fullscreen (Esc)" aria-label="Close Fullscreen">
+                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lightbox Image Viewport with Pan & Drag -->
+            <div class="lightbox-viewport" id="lightboxViewport" onclick="closeImageLightbox(event)">
+                <div class="lightbox-canvas" id="lightboxCanvas">
+                    <img id="lightboxImage" src="" alt="YOLO Annotated High-Resolution Inspection Result" onclick="event.stopPropagation()">
+                </div>
+            </div>
+
+            <!-- Lightbox Footer Info Strip -->
+            <div class="lightbox-footer" id="lightboxFooter" onclick="event.stopPropagation()">
+                <div class="lightbox-hint">
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>Click outside image or press ESC to exit · Scroll to zoom · Drag to pan</span>
+                </div>
+                <div class="lightbox-badges" id="lightboxBadges"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LOADING OVERLAY
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">Analyzing waste...</p>
+            <div class="loading-progress-dots">
+                <span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SECTION H – FOOTER (PHOTO CREDITS & PROJECT METADATA)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-brand-title">
+                    <span class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <polyline points="23 20 23 14 17 14"></polyline>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                        </svg>
+                    </span>
+                    <h3>EcoSort AI</h3>
+                </div>
+                <p class="footer-brand-desc">
+                    Material Intelligence at the edge. On-device neural vision (YOLOv8) paired with compact LLM reasoning (Llama 1B) for contamination-free segregation and upcycling.
+                </p>
+                <div class="footer-guarantees">
+                    <div class="guarantee-badge">
+                        <span class="guarantee-dot"></span>
+                        <span><strong>100% On-Device Privacy:</strong> Zero cloud egress. Neural models execute locally in browser memory and local host.</span>
+                    </div>
+                    <div class="guarantee-badge">
+                        <span class="guarantee-dot dot-cyan"></span>
+                        <span><strong>WCAG 2.2 AA Accessibility:</strong> High contrast palette, visible keyboard focus, screen-reader semantic landmarks.</span>
+                    </div>
+                </div>
+                <div class="footer-challenge-badge">
+                    Bharat AI-SoC Challenge 2026–27 · Problem Statement 2 (PS2)
+                </div>
+            </div>
+
+            <div class="footer-credits">
+                <h4>
+                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Image Credits &amp; Attribution
+                </h4>
+                <p class="credits-text">
+                    All photographs used in this interface are provided under free licenses (Creative Commons CC BY, CC
+                    BY-SA, and Public Domain) via Wikimedia Commons:
+                </p>
+                <ul class="credits-list">
+                    <li>PET Bottle Bales: <em>Bales of PET bottles</em> (CC BY-SA 4.0 via Wikimedia Commons)</li>
+                    <li>Metal Cans: <em>Recycling boxes of Aluminum cans in Japan</em> (CC BY 2.0 via Wikimedia Commons)
+                    </li>
+                    <li>Paper &amp; Cardboard: <em>Baal door Balenpers</em> (CC BY-SA 3.0 via Wikimedia Commons)</li>
+                    <li>Glass Recycling: <em>Bottle bank in Tokyo</em> (CC BY-SA 3.0 via Wikimedia Commons)</li>
+                    <li>Sorting Facility: <em>Materials recovery facility</em> (CC BY-SA 3.0 via Wikimedia Commons)</li>
+                    <li>Sorting Bins: <em>Afvalstraatje containers</em> (CC BY-SA 3.0 via Wikimedia Commons)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-copy">
+                &copy; 2026–2027 EcoSort · Multimodal AI Waste Segregation Assistant.
+            </div>
+            <div class="footer-tech-stack">
+                <span>YOLOv8 Edge Vision</span> &bull;
+                <span>Llama 1B Local Reasoning</span> &bull;
+                <span>Arm SoC Target</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=8.0.0"></script>
+</body>
+
+</html>

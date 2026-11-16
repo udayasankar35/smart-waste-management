@@ -1,0 +1,17 @@
+# Robots.txt for EcoSort AI
+# https://ecosort.ai
+
+User-agent: *
+Allow: /
+Disallow: /api/webcam/feed
+Disallow: /api/webcam/capture
+
+# LLM & AI Agents
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://ecosort.ai/sitemap.xml

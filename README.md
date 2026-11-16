@@ -1,6 +1,7 @@
 # ♻️ AI-Enabled Smart Waste Segregation & Monitoring System (Zynq-7000 SoC)
 
 [![Platform: Zynq-7000](https://img.shields.io/badge/Platform-Xilinx%20Zynq--7000%20(ZedBoard)-orange?logo=xilinx)](https://www.xilinx.com/)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/udayasankar35/smart-waste-management)
 [![AI Model: YOLOv8](https://img.shields.io/badge/Vision-YOLOv8%20Custom-blue?logo=ultralytics)](https://github.com/ultralytics/ultralytics)
 [![LLM: Llama 3.2 1B](https://img.shields.io/badge/LLM-Llama%203.2%201B%20Instruct-purple?logo=meta)](https://huggingface.co/meta-llama)
 [![OS: PetaLinux / Embedded Linux](https://img.shields.io/badge/OS-PetaLinux%20%2F%20Embedded%20Linux-green?logo=linux)](https://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.html)
@@ -151,6 +152,20 @@ python3 main_zynq.py
 python3 /mnt/ext_storage/web_app.py
 ```
 Access the dashboard at `http://<ZEDBOARD_IP>:5000`.
+
+---
+
+## ☁️ Deploy to Vercel (1-Click Cloud Web App)
+
+The repository includes a ready-to-deploy serverless configuration (`vercel.json` + `api/index.py`) for hosting the interactive web dashboard on Vercel:
+
+1. Go to [Vercel Dashboard](https://vercel.com/new).
+2. Click **Add New...** -> **Project**.
+3. Import your repository: `udayasankar35/smart-waste-management`.
+4. Leave all settings at default (Root Directory: `./`, Framework Preset: **Other**).
+5. Click **Deploy**.
+
+Vercel will automatically build the `@vercel/python` serverless function and assign a live production URL (e.g., `https://smart-waste-management.vercel.app`).
 
 ---
 
