@@ -16,7 +16,7 @@ import json
 import urllib.request
 import urllib.parse
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     import cv2
@@ -1051,7 +1051,7 @@ class WasteAdvisor:
         confidence: float = 0.0,
         bbox: Optional[List[float]] = None,
         detected_object: Optional[str] = None,
-        image: Optional[np.ndarray] = None,
+        image: Optional[Any] = None,
     ) -> Dict:
         """
         Estimate the specific object identity, material/plastic resin code,
@@ -1424,7 +1424,7 @@ class WasteAdvisor:
         confidence: float = 0.0,
         bbox: Optional[List[float]] = None,
         detected_object: Optional[str] = None,
-        image: Optional[np.ndarray] = None,
+        image: Optional[Any] = None,
     ) -> Dict:
         """Generate comprehensive disposal, object guess, recycling, and household reuse advice."""
         waste_type_key = waste_type.lower().replace(" ", "_").replace("-", "_")
