@@ -47,12 +47,18 @@ MAX_UPLOAD_MB = 25
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
 
 # ── Import WasteAdvisor Domain Engine ─────────────────────────────────────────
+ADVISOR_LOAD_ERROR = None
 try:
-    from waste_advisor import WasteAdvisor
+    try:
+        from api.waste_advisor import WasteAdvisor
+    except ImportError:
+        from waste_advisor import WasteAdvisor
     advisor = WasteAdvisor()
 except Exception as e:
+    import traceback
     advisor = None
-    print(f"Warning: WasteAdvisor loaded in fallback mode: {e}")
+    ADVISOR_LOAD_ERROR = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
+    print(f"Warning: WasteAdvisor loaded in fallback mode: {ADVISOR_LOAD_ERROR}")
 
 
 # ── In-Memory Telemetry Cache for Serverless ──────────────────────────────────
@@ -236,7 +242,12 @@ def health():
         "status": "healthy",
         "platform": "Vercel Serverless / Zynq-7000 Hybrid",
         "timestamp": datetime.now().isoformat(),
-        "edge_ready": True
+        "edge_ready": True,
+        "advisor_loaded": advisor is not None,
+        "advisor_error": ADVISOR_LOAD_ERROR,
+        "current_dir": CURRENT_DIR,
+        "dir_contents": os.listdir(CURRENT_DIR) if os.path.exists(CURRENT_DIR) else [],
+        "python_version": sys.version
     })
 
 
