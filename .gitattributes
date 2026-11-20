@@ -1,0 +1,3 @@
+*.sh text eol=lf
+S99ecosort text eol=lf
+*.py text eol=lf

@@ -2,11 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
+      "src": "cloud_demo/api/index.py",
       "use": "@vercel/python",
       "config": {
         "includeFiles": [
-          "api/**",
+          "cloud_demo/api/**",
           "web/**"
         ]
       }
@@ -15,8 +15,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "cloud_demo/api/index.py"
     }
   ]
 }
-

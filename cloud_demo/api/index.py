@@ -24,15 +24,23 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 
 # ── Dynamic Path Setup ────────────────────────────────────────────────────────
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+REPO_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
 sys.path.insert(0, CURRENT_DIR)
-sys.path.insert(0, ROOT_DIR)
+sys.path.insert(0, os.path.abspath(os.path.join(CURRENT_DIR, "..")))
+sys.path.insert(0, REPO_ROOT)
 
-# Locate templates & static assets
-template_dir = os.path.join(ROOT_DIR, "web", "templates")
-static_dir   = os.path.join(ROOT_DIR, "web", "static")
+# Locate templates & static assets (works locally and in Vercel task directory)
+template_dir = None
+static_dir = None
+for base in [REPO_ROOT, os.path.abspath(os.path.join(CURRENT_DIR, "..")), CURRENT_DIR]:
+    td = os.path.join(base, "web", "templates")
+    sd = os.path.join(base, "web", "static")
+    if os.path.exists(td) and os.path.exists(sd):
+        template_dir = td
+        static_dir = sd
+        break
 
-if not os.path.exists(template_dir):
+if not template_dir:
     template_dir = os.path.join(CURRENT_DIR, "web", "templates")
     static_dir   = os.path.join(CURRENT_DIR, "web", "static")
 
@@ -50,9 +58,12 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
 ADVISOR_LOAD_ERROR = None
 try:
     try:
-        from api.waste_advisor import WasteAdvisor
+        from cloud_demo.api.waste_advisor import WasteAdvisor
     except ImportError:
-        from waste_advisor import WasteAdvisor
+        try:
+            from api.waste_advisor import WasteAdvisor
+        except ImportError:
+            from waste_advisor import WasteAdvisor
     advisor = WasteAdvisor()
 except Exception as e:
     import traceback
@@ -205,8 +216,12 @@ def draw_yolo_bounding_box(img: Image.Image, bbox, class_name: str, detected_obj
 
 @app.route("/")
 def index():
-    """Main Web Dashboard"""
-    return render_template("index.html")
+    """Main Web Dashboard (Cloud Simulation View)"""
+    return render_template(
+        "index.html",
+        is_cloud_simulation=True,
+        demo_banner="Simulated Demo — Running cloud fallback simulation, not on-board ZedBoard hardware"
+    )
 
 
 @app.route("/favicon.ico")
@@ -263,14 +278,21 @@ def llama_status():
     })
 
 
+@app.route("/api/status")
 @app.route("/api/webcam/status")
-def webcam_status():
-    """Webcam connectivity check"""
+def status():
+    """System and camera status check for cloud simulation"""
     return jsonify({
-        "connected": True,
-        "mode": "live_or_upload",
+        "status": "online",
+        "hardware_mode": "cloud_simulation",
+        "active_backend": "WasteAdvisor Knowledge Engine (Cloud Simulation)",
+        "advisor_loaded": advisor is not None,
+        "active_detector": "Cloud Simulation (PIL)",
+        "active_llm": "none",
+        "camera_connected": True,
         "fps": 15,
-        "resolution": "640x480"
+        "resolution": "640x480",
+        "note": "Simulated Demo — not running on-board ZedBoard hardware"
     })
 
 
@@ -471,21 +493,23 @@ def detect():
 
 @app.route("/api/stats")
 def stats():
-    """Live dashboard analytics & telemetry"""
+    """Live dashboard analytics & telemetry (honestly labelled as simulated)"""
     distribution = [
-        {"waste_type": "plastic", "count": 142},
-        {"waste_type": "glass", "count": 68},
-        {"waste_type": "metal", "count": 89},
-        {"waste_type": "paper", "count": 115},
-        {"waste_type": "organic", "count": 174}
+        {"waste_type": "plastic", "count": 142, "source": "simulated"},
+        {"waste_type": "glass", "count": 68, "source": "simulated"},
+        {"waste_type": "metal", "count": 89, "source": "simulated"},
+        {"waste_type": "paper", "count": 115, "source": "simulated"},
+        {"waste_type": "organic", "count": 174, "source": "simulated"}
     ]
     return jsonify({
         "success": True,
+        "is_simulated": True,
+        "source": "simulated",
         "total_records": sum(d["count"] for d in distribution),
         "waste_distribution": distribution,
-        "daily_stats": [{"date": datetime.now().strftime("%Y-%m-%d"), "count": 48}],
+        "daily_stats": [{"date": datetime.now().strftime("%Y-%m-%d"), "count": 48, "source": "simulated"}],
         "recent_alerts": [
-            {"alert_type": "bin_overflow", "severity": "warning", "message": "Bin fill reached 75%", "timestamp": "10 mins ago"}
+            {"alert_type": "hazard_advisory", "severity": "info", "message": "Hazard advisory engine active", "timestamp": "Just now", "source": "system"}
         ]
     })
 

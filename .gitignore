@@ -12,15 +12,26 @@ __pycache__/
 venv/
 env/
 ENV/
-version one/
-"version one"/
 
-# Large model weights (>50MB, cannot be committed directly to GitHub)
+# Databases & local journals (do not commit runtime DBs)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+
+# Large weights and binaries (>50MB, cannot be committed directly to GitHub)
 *.gguf
 *.pte
-*.onnx
 *.zip
 *.tar.gz
+ecosort-board.tar.gz
+
+# Allow exported models under models/
+!models/*.onnx
+!models/*.param
+!models/*.bin
+!models/*.pt
 
 # Datasets and archives
 waste.v28i.yolov11.zip
@@ -30,16 +41,12 @@ waste-detection.v1i.yolov8/
 P-yesist-v2/
 test C2S/
 
-
 # Logs and runtime artifacts
 logs/*.log
 *.log
 _patch_tmp/
 .pytest_cache/
 .claude/
-
-# Database journals and active locks
-*.db-journal
 
 # Vivado and EDA build files
 *.jou
@@ -59,4 +66,3 @@ vivado_zedboard_project/
 Thumbs.db
 .tmp.driveupload/
 *.tmp
-
